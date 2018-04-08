@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import git
+import os
+import sys
+import yaml
+
+
+def load_config(config_filename):
+    config_path = os.path.expanduser('~/' + config_filename)
+    return yaml.safe_load(open(config_path))
+
+
+def main():
+
+    # Check for correct command usage
+    if len(sys.argv) != 2:
+        print('Usage: ' + sys.argv[0] + ' <dev branch>')
+        sys.exit(1)
+
+    # Attempt to load configuration file
+    config_filename = '.smush.yml'
+    try:
+        config = load_config(config_filename)
+    except:
+        print('Unable to load ~/' + config_filename + ': does it exist?')
+        sys.exit(1)
+
+    # Verify QA branch has been set in the config file
+    if 'qa branch' not in config:
+        print('Please set "qa branch" in ' + config_filename + '.')
+        sys.exit(1)
+
+    # Set dev branch name from command-line argument
+    dev_branch = sys.argv[1]
+    qa_branch = config['qa branch']
+
+    # Make sure command's being executed in a Git repository
+    try:
+        git.Repo('.').git_dir
+        g = git.cmd.Git('.')
+    except:
+        print('You must be in a git repository to run this command.')
+        sys.exit(1)
+
+    # Show "before notes" from config, if any
+    if 'before notes' in config:
+        print(config['before notes'])
+
+    # Make sure QA branch is up to date
+    print('Checking out QA branch...')
+    g.checkout(qa_branch)
+    print('Updating QA branch...')
+    g.pull('--rebase')
+
+    # Rebase dev branch
+    print('Checking out dev branch..')
+    g.checkout(dev_branch)
+    print('Updating dev branch with work from QA...')
+    g.rebase(qa_branch)
+
+    # Push rebased version (so it'll get marked as merged later if on
+    # Github)
+    print('Pushing updated dev branch...')
+    g.push('--force')
+
+    # Do actual merge (with fast forward option as dev branch is rebased)
+    print('Checking out QA branch...')
+    g.checkout(qa_branch)
+    print('Merging dev branch...')
+    g.merge('--ff-only', dev_branch)
+
+    # Push merge and delete dev branch
+    print('Pushing QA branch with dev branch merged...')
+    g.push()
+    print('Deleting dev branch...')
+    g.push('origin', ':' + dev_branch)
+
+    print('Done!')
+
+    # Show "after notes" from config, if any
+    if 'after notes' in config:
+        print(config['after notes'])
+
+
+if __name__ == '__main__':
+    main()
