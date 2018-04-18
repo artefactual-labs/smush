@@ -19,9 +19,7 @@ Installation
 
 1. Install the required Python modules:
 
-    pip install gitpython
-
-    pip install PyYAML
+    pip install -r requirements.txt
 
 2. Stick the "smush" script somewhere you can run it from.
 
