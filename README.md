@@ -7,12 +7,16 @@ Usage: `smush <dev branch>`
 
 Does the following:
 
-1. Updates QA branch
-2. Rebases dev branch using QA
-3. Forces push dev branch
-4. Merges dev branch into QA
-5. Pushes QA branch
-6. Deletes dev branch
+1. Optionally shows text reminders (from configuration file) before merge
+2. Updates QA branch
+3. Rebases dev branch using QA
+4. Forces push dev branch
+5. Displays unmerged commits
+6. Asks confirmation to go ahead with merge
+7. Merges dev branch into QA
+8. Pushes QA branch
+9. Deletes dev branch
+10. Optionally shows reminders (from configuration file) after merge
 
 Installation
 ------------
