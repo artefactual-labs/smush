@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from builtins import input
 import git
 import os
 import sys
@@ -68,6 +69,13 @@ def main():
     # Do actual merge (with fast forward option as dev branch is rebased)
     print('Checking out QA branch...')
     g.checkout(qa_branch)
+
+    # Display unmerged commits in dev branch
+    print()
+    print(g.log('..' + dev_branch))
+    print()
+    input('Press ENTER to merge the above commits, CTRL-C to abort.')
+
     print('Merging dev branch...')
     g.merge('--ff-only', dev_branch)
 
