@@ -10,7 +10,7 @@ Does the following:
 1. Optionally shows text reminders (from configuration file) before merge
 2. Updates QA branch
 3. Rebases dev branch using QA
-4. Forces push dev branch
+4. Force pushes dev branch
 5. Displays unmerged commits
 6. Asks confirmation to go ahead with merge
 7. Merges dev branch into QA
