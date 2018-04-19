@@ -30,7 +30,7 @@ Installation
 Configuration
 -------------
 
-Edit $HOME/.smush.yml and set "qa branch" to desired QA branch.
+Edit the $HOME/.smush.yml YAML-formatted config file and set "qa branch" to desired QA branch.
 
 Example:
 
