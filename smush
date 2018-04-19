@@ -13,6 +13,11 @@ def load_config(config_filename):
     return yaml.safe_load(open(config_path))
 
 
+def get_confirmation(prompt):
+    confirm = input(prompt + ' [y/n] ')
+    return len(confirm) and confirm[0].lower() == 'y'
+
+
 def main():
 
     # Check for correct command usage
@@ -74,7 +79,9 @@ def main():
     print()
     print(g.log('..' + dev_branch))
     print()
-    input('Press ENTER to merge the above commits, CTRL-C to abort.')
+    if not get_confirmation('Would you like to merge the above commits?'):
+        print('Merge aborted.')
+        sys.exit(1)
 
     print('Merging dev branch...')
     g.merge('--ff-only', dev_branch)
