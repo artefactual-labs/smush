@@ -10,12 +10,12 @@ import yaml
 
 
 def load_config(config_filename):
-    config_path = os.path.expanduser('~/' + config_filename)
+    config_path = os.path.join(os.path.expanduser('~'), config_filename)
     return yaml.safe_load(open(config_path))
 
 
 def get_confirmation(prompt):
-    confirm = input(prompt + ' [y/n] ')
+    confirm = input('{} [y/n] '.format(prompt))
     return len(confirm) and confirm[0].lower() == 'y'
 
 
@@ -33,12 +33,12 @@ def main():
     try:
         config = load_config(config_filename)
     except:
-        print('Unable to load ~/' + config_filename + ': does it exist?')
+        print('Unable to load ~/{}: does it exist?'.format(config_filename))
         sys.exit(1)
 
     # Verify QA branch has been set in the config file
     if 'qa branch' not in config:
-        print('Please set "qa branch" in ' + config_filename + '.')
+        print('Please set "qa branch" in {}.'.format(config_filename))
         sys.exit(1)
 
     # Set QA branch name from config
@@ -79,7 +79,7 @@ def main():
 
     # Display unmerged commits in dev branch
     print()
-    print(g.log('..' + args.dev_branch))
+    print(g.log('..{}'.format(args.dev_branch)))
     print()
     if not get_confirmation('Would you like to merge the above commits?'):
         print('Merge aborted.')
@@ -92,7 +92,7 @@ def main():
     print('Pushing QA branch with dev branch merged...')
     g.push()
     print('Deleting dev branch...')
-    g.push('origin', ':' + args.dev_branch)
+    g.push('origin', ':{}'.format(args.dev_branch))
 
     print('Done!')
 
