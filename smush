@@ -4,8 +4,10 @@ from __future__ import print_function
 from builtins import input
 import argparse
 import git
+import json
 import os
 import sys
+import urllib2
 import yaml
 
 
@@ -17,6 +19,16 @@ def load_config(config_filename):
 def get_confirmation(prompt):
     confirm = input('{} [y/n] '.format(prompt))
     return len(confirm) and confirm[0].lower() == 'y'
+
+
+def check_if_open_pull_request_exists_for_branch(owner, repo, branch):
+    pr_url = 'https://api.github.com/repos/{}/{}/pulls?state=open'.format(owner, repo)
+    unparsed_result = urllib2.urlopen(pr_url).read()
+    pull_requests = json.loads(unparsed_result)
+
+    for pr in pull_requests:
+        if pr['head']['ref'] == branch:
+            return True
 
 
 def main():
@@ -55,6 +67,12 @@ def main():
     # Show "before notes" from config, if any
     if 'before notes' in config:
         print(config['before notes'])
+
+    # Make sure an open pull request exists for the dev branch
+    if 'github owner' in config and 'github repo' in config:
+        if not check_if_open_pull_request_exists_for_branch(config['github owner'], config['github repo'], args.dev_branch):
+            print('There is no open pull request for this branch.')
+            sys.exit(1)
 
     # Make sure QA branch is up to date
     print('Checking out QA branch...')
