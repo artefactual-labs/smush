@@ -36,6 +36,9 @@ Example:
 
     qa branch: qa/2.5.x
 
+Setting "github owner" and "github repo" in your configuration file can, optionally, enable you
+to have smush check to make sure an open pull request exists for the dev branch.
+
 Setting "before notes" in your configuration file can, optionally, display
 notes/reminders before you merge. Likewise, setting "after notes" can display
 notes/reminders after you merge.
