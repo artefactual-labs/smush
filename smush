@@ -6,6 +6,7 @@ import argparse
 import git
 import json
 import os
+import subprocess
 import sys
 import urllib2
 import yaml
@@ -31,6 +32,12 @@ def check_if_open_pull_request_exists_for_branch(owner, repo, branch):
             return True
 
 
+def display_unmerged_commits(g, dev_branch):
+    print()
+    print(g.log('..{}'.format(dev_branch)))
+    print()
+
+
 def main():
 
     # Parse arguments
@@ -38,6 +45,7 @@ def main():
         description='Automate merging of feature branches.')
     parser.add_argument('dev_branch', metavar='dev_branch', type=str,
                         help='feature branch to merge')
+    parser.add_argument('--skip-pr-check', action='store_true')
     args = parser.parse_args()
 
     # Attempt to load configuration file
@@ -69,7 +77,7 @@ def main():
         print(config['before notes'])
 
     # Make sure an open pull request exists for the dev branch
-    if 'github owner' in config and 'github repo' in config:
+    if 'github owner' in config and 'github repo' in config and not args.skip_pr_check:
         if not check_if_open_pull_request_exists_for_branch(config['github owner'], config['github repo'], args.dev_branch):
             print('There is no open pull request for this branch.')
             sys.exit(1)
@@ -95,10 +103,22 @@ def main():
     print('Checking out QA branch...')
     g.checkout(qa_branch)
 
+    # Determine number of new commits and offer to rebase if greater than one
+    number_of_unmerged_commits = int(g.rev_list('--count', qa_branch + '..' + args.dev_branch))
+    if number_of_unmerged_commits > 1:
+        display_unmerged_commits(g, args.dev_branch)
+
+        print('There is more than one new commit present in dev branch.')
+        if get_confirmation('Would you like to interactively rebase?'):
+            g.checkout(args.dev_branch)
+            subprocess.call(['git', 'rebase', '-i', 'HEAD~' + str(number_of_unmerged_commits)])
+            print('Updating dev branch...')
+            g.push('--force')
+            g.checkout(qa_branch)
+
     # Display unmerged commits in dev branch
-    print()
-    print(g.log('..{}'.format(args.dev_branch)))
-    print()
+    display_unmerged_commits(g, args.dev_branch)
+
     if not get_confirmation('Would you like to merge the above commits?'):
         print('Merge aborted.')
         sys.exit(1)
