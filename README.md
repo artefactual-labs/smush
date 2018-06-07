@@ -12,12 +12,15 @@ Does the following:
 3. Updates QA branch
 4. Rebases dev branch using QA
 5. Force pushes dev branch
-6. Displays unmerged commits
-7. Asks confirmation to go ahead with merge
-8. Merges dev branch into QA
-9. Pushes QA branch
-10. Deletes dev branch
-11. Optionally shows reminders (from configuration file) after merge
+6. Allows optional interactive rebasing if more than one commit is to be merged
+7. Displays unmerged commits
+8. Asks confirmation to go ahead with merge
+9. Merges dev branch into QA
+10. Pushes QA branch
+11. Deletes dev branch
+12. Optionally shows reminders (from configuration file) after merge
+
+The `--skip-pr-check` option skips step 2 of the above sequence.
 
 Installation
 ------------
