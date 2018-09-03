@@ -14,7 +14,7 @@ Does the following:
 5. Force pushes dev branch
 6. Allows optional interactive rebasing if more than one commit is to be merged
 7. Displays unmerged commits
-8. Displays commit style issues (see Style Checking)
+8. Displays commit style issues (see **Style Checking**)
 9. Asks confirmation to go ahead with merge
 10. Merges dev branch into QA
 11. Pushes QA branch
@@ -60,6 +60,6 @@ The commit style check checks commit messages to make sure that:
 
 2. Subsequent lines in the commit message aren't over 72 characters in length.
 
-This convention is described here:
+This convention, and the reasoning behind it, is described here:
 
 https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
