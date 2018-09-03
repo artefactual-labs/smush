@@ -58,10 +58,11 @@ The commit style check checks commit messages to make sure that:
 1. The first line of the commit message (described as the "subject line") isn't
    over 50 characters in length.
 
-2. Subsequent lines in the commit message aren't over 72 characters in length.
+2. Subsequent lines in the commit message (described as "body lines") aren't
+   over 72 characters in length.
 
-3. There's a blank line between the first line of the commit message and any
-   subsequent lines.
+3. There's a blank line between the subject line of the commit message and any
+   subsequent body lines.
 
 This convention, and the reasoning behind it, is described here:
 
