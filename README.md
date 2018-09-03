@@ -55,8 +55,8 @@ Style checking
 
 The commit style check checks commit messages to make sure that:
 
-1. The first line of the commit message (described as "header") isn't over 50
-   characters in length.
+1. The first line of the commit message (described as the "subject line") isn't
+   over 50 characters in length.
 
 2. Subsequent lines in the commit message aren't over 72 characters in length.
 

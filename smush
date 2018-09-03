@@ -84,17 +84,17 @@ def check_commit_and_note_style_errors(commit):
 
     # Check header
     if len(commit["header"]) > 50:
-        errors.append("Header exceeds 50 characters.")
+        errors.append("Subject line exceeds 50 characters.")
 
     # Check if body occurs directly after header
     if "no blank line before body" in commit:
-        errors.append("Needs blank line after header.")
+        errors.append("If multi-line, needs blank line after subject line.")
 
     # Check lines
     line_number = 1
     for line in commit["body"]:
         if len(line) > 72:
-            errors.append("Line {} exceeds 72 characters.".format(line_number))
+            errors.append("Body line {} exceeds 72 characters.".format(line_number))
         line_number += 1
 
     # Add any errors to commit and append
