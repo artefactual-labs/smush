@@ -43,16 +43,19 @@ def display_unmerged_commits(g, dev_branch):
     print()
 
 
-def parse_git_log_output(log):
+def parse_and_check_git_log_output(log):
     commits = []
     commit = {}
+    blank_lines = 0
 
     for line in log.split("\n"):
         if line.startswith("commit "):
+            # Note errors, append commit, reset bookkeeping variables
             if commit != {}:
                 check_commit_and_note_style_errors(commit)
                 commits.append(commit)
                 commit = {}
+                blank_lines = 0
             commit["hash"] = line.replace("commit ", "")
         elif line.startswith("Author: "):
             commit["author"] = line.replace("Author: ", "")
@@ -62,7 +65,12 @@ def parse_git_log_output(log):
             commit["header"] = line[4:]
             commit["body"] = []
         elif line.strip() != "":
+            # Note if body line appears too early
+            if blank_lines == 1:
+                commit["no blank line before body"] = True
             commit["body"].append(line[4:])
+        else:
+            blank_lines += 1
 
     if commit != {}:
         check_commit_and_note_style_errors(commit)
@@ -78,6 +86,10 @@ def check_commit_and_note_style_errors(commit):
     if len(commit["header"]) > 50:
         errors.append("Header exceeds 50 characters.")
 
+    # Check if body occurs directly after header
+    if "no blank line before body" in commit:
+        errors.append("Needs blank line after header.")
+
     # Check lines
     line_number = 1
     for line in commit["body"]:
@@ -92,7 +104,7 @@ def check_commit_and_note_style_errors(commit):
 
 def display_commit_style_errors(g, dev_branch):
     log_output = g.log("..{}".format(dev_branch))
-    parsed_log = parse_git_log_output(log_output)
+    parsed_log = parse_and_check_git_log_output(log_output)
 
     for commit in parsed_log:
         if "errors" in commit and len(commit["errors"]):

@@ -60,6 +60,9 @@ The commit style check checks commit messages to make sure that:
 
 2. Subsequent lines in the commit message aren't over 72 characters in length.
 
+3. There's a blank line between the first line of the commit message and any
+   subsequent lines.
+
 This convention, and the reasoning behind it, is described here:
 
 https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
