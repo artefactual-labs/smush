@@ -14,7 +14,7 @@ Does the following:
 5. Force pushes dev branch
 6. Allows optional interactive rebasing if more than one commit is to be merged
 7. Displays unmerged commits
-8. Displays commit style issues (excess line length)
+8. Displays commit style issues (see Style Checking)
 9. Asks confirmation to go ahead with merge
 10. Merges dev branch into QA
 11. Pushes QA branch
@@ -22,6 +22,7 @@ Does the following:
 13. Optionally shows reminders (from config file) after merge
 
 The `--skip-pr-check` option skips step 2 of the above sequence.
+
 The `--skip-style-check` option skips step 8 of the above sequence.
 
 Installation
@@ -48,3 +49,17 @@ to have smush check to make sure an open pull request exists for the dev branch.
 Setting `before notes` in your configuration file can, optionally, display
 notes/reminders before you merge. Likewise, setting `after notes` can display
 notes/reminders after you merge.
+
+Style checking
+--------------
+
+The commit style check checks commit messages to make sure that:
+
+1. The first line of the commit message (described as "header") isn't over 50
+   characters in length.
+
+2. Subsequent lines in the commit message aren't over 72 characters in length.
+
+This convention is described here:
+
+https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
