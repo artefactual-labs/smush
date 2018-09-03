@@ -14,13 +14,15 @@ Does the following:
 5. Force pushes dev branch
 6. Allows optional interactive rebasing if more than one commit is to be merged
 7. Displays unmerged commits
-8. Asks confirmation to go ahead with merge
-9. Merges dev branch into QA
-10. Pushes QA branch
-11. Deletes dev branch
-12. Optionally shows reminders (from config file) after merge
+8. Displays commit style issues (excess line length)
+9. Asks confirmation to go ahead with merge
+10. Merges dev branch into QA
+11. Pushes QA branch
+12. Deletes dev branch
+13. Optionally shows reminders (from config file) after merge
 
 The `--skip-pr-check` option skips step 2 of the above sequence.
+The `--skip-style-check` option skips step 8 of the above sequence.
 
 Installation
 ------------

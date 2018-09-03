@@ -43,6 +43,68 @@ def display_unmerged_commits(g, dev_branch):
     print()
 
 
+def parse_git_log_output(log):
+    commits = []
+    commit = {}
+
+    for line in log.split("\n"):
+        if line.startswith("commit "):
+            if commit != {}:
+                check_commit_and_note_style_errors(commit)
+                commits.append(commit)
+                commit = {}
+            commit["hash"] = line.replace("commit ", "")
+        elif line.startswith("Author: "):
+            commit["author"] = line.replace("Author: ", "")
+        elif line.startswith("Date:   "):
+            commit["date"] = line.replace("Date:   ", "")
+        elif "body" not in commit and line.strip() != "":
+            commit["header"] = line[4:]
+            commit["body"] = []
+        elif line.strip() != "":
+            commit["body"].append(line[4:])
+
+    if commit != {}:
+        check_commit_and_note_style_errors(commit)
+        commits.append(commit)
+
+    return commits
+
+
+def check_commit_and_note_style_errors(commit):
+    errors = []
+
+    # Check header
+    if len(commit["header"]) > 50:
+        errors.append("Header exceeds 50 characters.")
+
+    # Check lines
+    line_number = 1
+    for line in commit["body"]:
+        if len(line) > 72:
+            errors.append("Line {} exceeds 72 characters.".format(line_number))
+        line_number += 1
+
+    # Add any errors to commit and append
+    if len(errors):
+        commit["errors"] = errors
+
+
+def display_commit_style_errors(g, dev_branch):
+    log_output = g.log("..{}".format(dev_branch))
+    parsed_log = parse_git_log_output(log_output)
+
+    for commit in parsed_log:
+        if "errors" in commit and len(commit["errors"]):
+            print("Style error(s) found in commit {}:".format(commit["hash"]))
+            print()
+
+            for line in commit["errors"]:
+                print("    {}".format(line))
+
+            print()
+
+
 def main():
 
     # Parse arguments
@@ -50,6 +112,7 @@ def main():
         description='Automate merging of feature branches.')
     parser.add_argument('dev_branch', metavar='dev_branch', type=str,
                         help='feature branch to merge')
+    parser.add_argument('--skip-style-check', action='store_true')
     parser.add_argument('--skip-pr-check', action='store_true')
     args = parser.parse_args()
 
@@ -119,6 +182,10 @@ def main():
 
     # Display unmerged commits in dev branch
     display_unmerged_commits(g, args.dev_branch)
+
+    # Show commit style errors
+    if not args.skip_style_check:
+        display_commit_style_errors(g, args.dev_branch)
 
     if not get_confirmation('Would you like to merge the above commits?'):
         abort('Merge aborted.')
