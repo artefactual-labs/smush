@@ -200,6 +200,7 @@ def main():
         display_commit_style_errors(g, args.dev_branch)
 
     if not get_confirmation('Would you like to merge the above commits?'):
+        g.checkout(args.dev_branch)
         abort('Merge aborted.')
 
     print('Merging dev branch...')
