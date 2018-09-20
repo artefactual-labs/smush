@@ -117,6 +117,32 @@ def display_commit_style_errors(g, dev_branch):
             print()
 
 
+def checkout_qa_branch_and_check_dev_branch(g, qa_branch, dev_branch, skip_style_check = False):
+    g.checkout(qa_branch)
+
+    # Determine number of new commits and offer to rebase if greater than one
+    number_of_unmerged_commits = int(g.rev_list('--count', qa_branch + '..' + dev_branch))
+    if number_of_unmerged_commits > 1:
+        display_unmerged_commits(g, dev_branch)
+
+        print('There is more than one new commit present in dev branch.')
+        if get_confirmation('Would you like to interactively rebase?'):
+            g.checkout(dev_branch)
+            subprocess.call(['git', 'rebase', '-i', 'HEAD~' + str(number_of_unmerged_commits)])
+            print('Updating dev branch...')
+            g.push('--force')
+            g.checkout(qa_branch)
+    elif number_of_unmerged_commits == 0:
+        abort('No unmerged commits found.')
+
+    # Display unmerged commits in dev branch
+    display_unmerged_commits(g, dev_branch)
+
+    # Show commit style errors
+    if not skip_style_check:
+        display_commit_style_errors(g, dev_branch)
+
+
 def main():
 
     # Parse arguments
@@ -124,6 +150,7 @@ def main():
         description='Automate merging of feature branches.')
     parser.add_argument('dev_branch', metavar='dev_branch', type=str,
                         help='feature branch to merge')
+    parser.add_argument('--check', action='store_true', default=False)
     parser.add_argument('--skip-style-check', action='store_true')
     parser.add_argument('--skip-pr-check', action='store_true')
     args = parser.parse_args()
@@ -148,6 +175,11 @@ def main():
         g = git.cmd.Git('.')
     except:
         abort('You must be in a git repository to run this command.')
+
+    # Check branch and exit, if in --check mode
+    if args.check:
+        checkout_qa_branch_and_check_dev_branch(g, qa_branch, args.dev_branch, args.skip_style_check)
+        sys.exit(0)
 
     # Show "before notes" from config, if any
     if 'before notes' in config:
@@ -176,29 +208,10 @@ def main():
     g.push('--force')
 
     # Do actual merge (with fast forward option as dev branch is rebased)
-    print('Checking out QA branch...')
-    g.checkout(qa_branch)
+    print('Checking QA branch...')
+    checkout_qa_branch_and_check_dev_branch(g, qa_branch, dev_branch)
 
-    # Determine number of new commits and offer to rebase if greater than one
-    number_of_unmerged_commits = int(g.rev_list('--count', qa_branch + '..' + args.dev_branch))
-    if number_of_unmerged_commits > 1:
-        display_unmerged_commits(g, args.dev_branch)
-
-        print('There is more than one new commit present in dev branch.')
-        if get_confirmation('Would you like to interactively rebase?'):
-            g.checkout(args.dev_branch)
-            subprocess.call(['git', 'rebase', '-i', 'HEAD~' + str(number_of_unmerged_commits)])
-            print('Updating dev branch...')
-            g.push('--force')
-            g.checkout(qa_branch)
-
-    # Display unmerged commits in dev branch
-    display_unmerged_commits(g, args.dev_branch)
-
-    # Show commit style errors
-    if not args.skip_style_check:
-        display_commit_style_errors(g, args.dev_branch)
-
+    # Merge or abort
     if not get_confirmation('Would you like to merge the above commits?'):
         g.checkout(args.dev_branch)
         abort('Merge aborted.')
