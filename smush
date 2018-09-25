@@ -209,7 +209,7 @@ def main():
 
     # Do actual merge (with fast forward option as dev branch is rebased)
     print('Checking QA branch...')
-    checkout_qa_branch_and_check_dev_branch(g, qa_branch, dev_branch)
+    checkout_qa_branch_and_check_dev_branch(g, qa_branch, args.dev_branch)
 
     # Merge or abort
     if not get_confirmation('Would you like to merge the above commits?'):
