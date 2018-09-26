@@ -106,8 +106,11 @@ def display_commit_style_errors(g, dev_branch):
     log_output = g.log("..{}".format(dev_branch))
     parsed_log = parse_and_check_git_log_output(log_output)
 
+    errors_found = False
     for commit in parsed_log:
         if "errors" in commit and len(commit["errors"]):
+            errors_found = True
+
             print("Style error(s) found in commit {}:".format(commit["hash"]))
             print()
 
@@ -116,8 +119,11 @@ def display_commit_style_errors(g, dev_branch):
 
             print()
 
+    if not errors_found:
+        print("No style errors found.")
 
-def checkout_qa_branch_and_check_dev_branch(g, qa_branch, dev_branch, skip_style_check = False):
+
+def checkout_qa_branch_and_check_dev_branch(g, qa_branch, dev_branch, skip_style_check=False):
     g.checkout(qa_branch)
 
     # Determine number of new commits and offer to rebase if greater than one
