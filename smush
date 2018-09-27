@@ -12,6 +12,20 @@ import urllib2
 import yaml
 
 
+def define_parser():
+    parser = argparse.ArgumentParser(
+        description='Automate merging of feature branches.')
+
+    parser.add_argument('dev_branch', metavar='dev_branch', type=str,
+                        help='feature branch to merge')
+    parser.add_argument('--check', action='store_true', default=False)
+    parser.add_argument('--skip-style-check', action='store_true')
+    parser.add_argument('--skip-pr-check', action='store_true')
+    parser.add_argument('--delete-local', action='store_true', default=False)
+
+    return parser
+
+
 def load_config(config_filename):
     config_path = os.path.join(os.path.expanduser('~'), config_filename)
     return yaml.safe_load(open(config_path))
@@ -151,18 +165,7 @@ def checkout_qa_branch_and_check_dev_branch(g, qa_branch, dev_branch, skip_style
 
 def main():
 
-    # Parse arguments
-    parser = argparse.ArgumentParser(
-        description='Automate merging of feature branches.')
-
-    parser.add_argument('dev_branch', metavar='dev_branch', type=str,
-                        help='feature branch to merge')
-    parser.add_argument('--check', action='store_true', default=False)
-    parser.add_argument('--skip-style-check', action='store_true')
-    parser.add_argument('--skip-pr-check', action='store_true')
-    parser.add_argument('--delete-local', action='store_true', default=False)
-
-    args = parser.parse_args()
+    args = define_parser().parse_args()
 
     # Attempt to load configuration file
     config_filename = '.smush.yml'
