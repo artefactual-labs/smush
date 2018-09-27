@@ -154,11 +154,14 @@ def main():
     # Parse arguments
     parser = argparse.ArgumentParser(
         description='Automate merging of feature branches.')
+
     parser.add_argument('dev_branch', metavar='dev_branch', type=str,
                         help='feature branch to merge')
     parser.add_argument('--check', action='store_true', default=False)
     parser.add_argument('--skip-style-check', action='store_true')
     parser.add_argument('--skip-pr-check', action='store_true')
+    parser.add_argument('--delete-local', action='store_true', default=False)
+
     args = parser.parse_args()
 
     # Attempt to load configuration file
@@ -230,6 +233,11 @@ def main():
     g.push()
     print('Deleting dev branch...')
     g.push('origin', ':{}'.format(args.dev_branch))
+
+    # Optionally delete local dev branch
+    if args.delete_local:
+        print('Deleting local dev branch.')
+        g.branch('-D', args.dev_branch)
 
     print('Done!')
 
