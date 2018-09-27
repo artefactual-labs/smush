@@ -19,11 +19,14 @@ Does the following:
 10. Merges dev branch into QA
 11. Pushes QA branch
 12. Deletes dev branch
-13. Optionally shows reminders (from config file) after merge
+13. Optionally delete local dev branch
+14. Optionally shows reminders (from config file) after merge
 
 The `--skip-pr-check` option skips step 2 of the above sequence.
 
 The `--skip-style-check` option skips step 8 of the above sequence.
+
+The `--delete-local` option deletes the local dev branch.
 
 Installation
 ------------
