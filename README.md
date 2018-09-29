@@ -9,18 +9,19 @@ Does the following:
 
 1. Optionally shows text reminders (from config file) before merge
 2. Optionally verify (depending on config file settings) if open pull request exists for dev branch
-3. Updates QA branch
-4. Rebases dev branch using QA
-5. Force pushes dev branch
-6. Allows optional interactive rebasing if more than one commit is to be merged
-7. Displays unmerged commits
-8. Displays commit style issues (see **Style Checking**)
-9. Asks confirmation to go ahead with merge
-10. Merges dev branch into QA
-11. Pushes QA branch
-12. Deletes dev branch
-13. Optionally delete local dev branch
-14. Optionally shows reminders (from config file) after merge
+3. Optionally verify (depending on config file settings) if pull request base branch is QA branch
+4. Updates QA branch
+5. Rebases dev branch using QA
+6. Force pushes dev branch
+7. Allows optional interactive rebasing if more than one commit is to be merged
+8. Displays unmerged commits
+9. Displays commit style issues (see **Style Checking**)
+10. Asks confirmation to go ahead with merge
+11. Merges dev branch into QA
+12. Pushes QA branch
+13. Deletes dev branch
+14. Optionally delete local dev branch
+15. Optionally shows reminders (from config file) after merge
 
 The `--skip-pr-check` option skips step 2 of the above sequence.
 
