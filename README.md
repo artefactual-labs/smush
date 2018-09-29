@@ -7,9 +7,9 @@ Usage: `smush <dev branch>`
 
 Does the following:
 
-1. Optionally shows text reminders (from config file) before merge
-2. Optionally verify (depending on config file settings) if open pull request exists for dev branch
-3. Optionally verify (depending on config file settings) if pull request base branch is QA branch
+1. Optionally verify (depending on config file settings) if open pull request exists for dev branch
+2. Optionally verify (depending on config file settings) if pull request base branch is QA branch
+3. Optionally shows text reminders (from config file) before merge
 4. Updates QA branch
 5. Rebases dev branch using QA
 6. Force pushes dev branch
