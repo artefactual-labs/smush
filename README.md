@@ -1,33 +1,46 @@
 smush
 =====
 
-Script to automate merging of feature branches
+Script to automate merging of topic branches
 
-Usage: `smush <dev branch>`
+Summary
+-------
+
+This script automates steps required to merge a topic branch into a base
+branch. Before merging, the topic branch is rebased so it can be merged
+cleanly using `--ff-only` then pushed.
+
+If using GitHub, and a pull request exists for the topic branch, the pull
+request will be automatically marked as merged and closed.
+
+Functionality
+-------------
+
+Usage: `smush <topic branch>`
 
 Does the following:
 
-1. Optionally verify (depending on config file settings) if open pull request exists for dev branch
-2. Optionally verify (depending on config file settings) if pull request base branch is QA branch
+1. Optionally verify (depending on config file settings) if open pull request exists for topic branch
+2. Optionally verify (depending on config file settings) if pull request base branch matches configuration
 3. Optionally shows text reminders (from config file) before merge
-4. Updates QA branch
-5. Rebases dev branch using QA
-6. Force pushes dev branch
+4. Updates base branch
+5. Rebases topic branch using base branch
+6. Force pushes topic branch
 7. Allows optional interactive rebasing if more than one commit is to be merged
 8. Displays unmerged commits
 9. Displays commit style issues (see **Style Checking**)
 10. Asks confirmation to go ahead with merge
-11. Merges dev branch into QA
-12. Pushes QA branch
-13. Deletes dev branch
-14. Optionally delete local dev branch
+11. Merges topic branch into base branch
+12. Pushes base branch
+13. Deletes topic branch
+14. Optionally delete local topic branch
 15. Optionally shows reminders (from config file) after merge
 
 The `--skip-pr-check` option skips step 2 of the above sequence.
 
 The `--skip-style-check` option skips step 8 of the above sequence.
 
-The `--delete-local` option deletes the local dev branch.
+The `--delete-local` option deletes the local topic branch.
 
 Installation
 ------------
@@ -42,14 +55,14 @@ Configuration
 -------------
 
 Edit the `$HOME/.smush.yml` YAML-formatted configuration file and set
-`qa branch` to desired QA branch.
+`qa branch` to desired base branch.
 
 Example:
 
     qa branch: qa/2.5.x
 
 Setting `github owner` and `github repo` in your configuration file can, optionally, enable you
-to have smush check to make sure an open pull request exists for the dev branch.
+to have smush check to make sure an open pull request exists for the topic branch.
 
 Setting `before notes` in your configuration file can, optionally, display
 notes/reminders before you merge. Likewise, setting `after notes` can display
