@@ -6,9 +6,9 @@ Script to automate merging of topic branches
 Summary
 -------
 
-This script automates steps required to merge a topic branch into a base
-branch. Before merging, the topic branch is rebased so it can be merged
-cleanly using `--ff-only` then pushed.
+This script automates steps required to cleanly merge a topic branch into a
+base branch. No merge commits are made. Before merging, the topic branch is
+rebased so it can be merged using `--ff-only` then pushed.
 
 If using GitHub, and a pull request exists for the topic branch, the pull
 request will be automatically marked as merged and closed.
