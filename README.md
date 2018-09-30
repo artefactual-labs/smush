@@ -41,7 +41,8 @@ Installation
 Configuration
 -------------
 
-Edit the $HOME/.smush.yml YAML-formatted config file and set `qa branch` to desired QA branch.
+Edit the `$HOME/.smush.yml` YAML-formatted configuration file and set
+`qa branch` to desired QA branch.
 
 Example:
 
@@ -53,6 +54,10 @@ to have smush check to make sure an open pull request exists for the dev branch.
 Setting `before notes` in your configuration file can, optionally, display
 notes/reminders before you merge. Likewise, setting `after notes` can display
 notes/reminders after you merge.
+
+The `--profile` option can be used to load an alternative configuration. Using
+`--profile=backport`, for example, would result in $HOME/.smush-backport.yml being
+used as a configuration file.
 
 Style checking
 --------------
