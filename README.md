@@ -69,7 +69,7 @@ notes/reminders before you merge. Likewise, setting `after notes` can display
 notes/reminders after you merge.
 
 The `--profile` option can be used to load an alternative configuration. Using
-`--profile=backport`, for example, would result in $HOME/.smush-backport.yml being
+`--profile=backport`, for example, would result in `$HOME/.smush-backport.yml` being
 used as a configuration file.
 
 Style checking
