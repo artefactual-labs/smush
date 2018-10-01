@@ -38,9 +38,15 @@ def load_config(profile):
     config_path = os.path.join(os.path.expanduser('~'), config_filename)
 
     try:
-        return yaml.safe_load(open(config_path))
+        config = yaml.safe_load(open(config_path))
     except:
         abort('Unable to load ~/{}: does it exist?'.format(config_filename))
+
+    # Verify QA branch has been set in the config file
+    if 'qa branch' not in config:
+        abort('Please set "qa branch" in {}.'.format(config_filename))
+
+    return config
 
 
 def abort(error_message):
@@ -175,14 +181,18 @@ def checkout_qa_branch_and_check_dev_branch(g, qa_branch, dev_branch, skip_style
         display_commit_style_errors(g, dev_branch)
 
 
+def check_for_valid_pull_request(config, qa_branch, dev_branch):
+    pr = get_open_pull_request_for_branch(config['github owner'], config['github repo'], dev_branch)
+    if not pr:
+        abort('There is no open pull request for this branch.')
+    if pr['base']['ref'] != qa_branch:
+        abort("This pull request's base is {}, not {}.".format(pr['base']['ref'], qa_branch))
+
+
 def main():
     # Parse CLI args and load configuration
     args = define_parser().parse_args()
     config = load_config(args.profile)
-
-    # Verify QA branch has been set in the config file
-    if 'qa branch' not in config:
-        abort('Please set "qa branch" in {}.'.format(config_filename))
 
     # Set QA branch name from config
     qa_branch = config['qa branch']
@@ -192,7 +202,7 @@ def main():
         git.Repo('.').git_dir
         g = git.cmd.Git('.')
     except:
-        abort('You must be in a git repository to run this command.')
+        abort('You must be in the root directory of a git repository to run this command.')
 
     # Check branch and exit, if in --check mode
     if args.check:
@@ -201,11 +211,7 @@ def main():
 
     # Make sure an open pull request exists for the dev branch
     if 'github owner' in config and 'github repo' in config and not args.skip_pr_check:
-        pr = get_open_pull_request_for_branch(config['github owner'], config['github repo'], args.dev_branch)
-        if not pr:
-            abort('There is no open pull request for this branch.')
-        if pr['base']['ref'] != qa_branch:
-            abort("This pull request's base is {}, not {}.".format(pr['base']['ref'], qa_branch))
+        check_for_valid_pull_request(config, qa_branch, args.dev_branch)
 
     # Show "before notes" from config, if any
     if 'before notes' in config:
