@@ -27,9 +27,20 @@ def define_parser():
     return parser
 
 
-def load_config(config_filename):
+def load_config(profile):
+    # Assemble configuration file name
+    config_filename = '.smush'
+    if profile:
+        config_filename += '-' + profile
+    config_filename += '.yml'
+
+    # Attempt to load configuration file from user's home directory
     config_path = os.path.join(os.path.expanduser('~'), config_filename)
-    return yaml.safe_load(open(config_path))
+
+    try:
+        return yaml.safe_load(open(config_path))
+    except:
+        abort('Unable to load ~/{}: does it exist?'.format(config_filename))
 
 
 def abort(error_message):
@@ -165,20 +176,9 @@ def checkout_qa_branch_and_check_dev_branch(g, qa_branch, dev_branch, skip_style
 
 
 def main():
-
+    # Parse CLI args and load configuration
     args = define_parser().parse_args()
-
-    # Assemble configuration file name
-    config_filename = '.smush'
-    if args.profile:
-        config_filename += '-' + args.profile
-    config_filename += '.yml'
-
-    # Attempt to load configuration file name
-    try:
-        config = load_config(config_filename)
-    except:
-        abort('Unable to load ~/{}: does it exist?'.format(config_filename))
+    config = load_config(args.profile)
 
     # Verify QA branch has been set in the config file
     if 'qa branch' not in config:
