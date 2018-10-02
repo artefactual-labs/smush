@@ -55,11 +55,11 @@ Configuration
 -------------
 
 Edit the `$HOME/.smush.yml` YAML-formatted configuration file and set
-`qa branch` to desired base branch.
+`base branch` to desired base branch.
 
 Example:
 
-    qa branch: qa/2.5.x
+    base branch: qa/2.5.x
 
 Setting `github owner` and `github repo` in your configuration file can, optionally, enable you
 to have smush check to make sure an open pull request exists for the topic branch.

@@ -1,62 +1,21 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-from builtins import input
-import argparse
+import app
 import git
 import json
-import os
 import subprocess
 import sys
 import urllib2
-import yaml
 
 
-def define_parser():
-    parser = argparse.ArgumentParser(
-        description='Automate merging of feature branches.')
-
-    parser.add_argument('dev_branch', metavar='dev_branch', type=str,
-                        help='feature branch to merge')
-    parser.add_argument('--check', action='store_true', default=False)
-    parser.add_argument('--skip-style-check', action='store_true')
-    parser.add_argument('--skip-pr-check', action='store_true')
-    parser.add_argument('--delete-local', action='store_true', default=False)
-    parser.add_argument('--profile')
-
-    return parser
-
-
-def load_config(profile):
-    # Assemble configuration file name
-    config_filename = '.smush'
-    if profile:
-        config_filename += '-' + profile
-    config_filename += '.yml'
-
-    # Attempt to load configuration file from user's home directory
-    config_path = os.path.join(os.path.expanduser('~'), config_filename)
-
+def get_git_repository_handler():
+    # Make sure command's being executed in a Git repository
     try:
-        config = yaml.safe_load(open(config_path))
+        git.Repo('.').git_dir
+        return git.cmd.Git('.')
     except:
-        abort('Unable to load ~/{}: does it exist?'.format(config_filename))
-
-    # Verify QA branch has been set in the config file
-    if 'qa branch' not in config:
-        abort('Please set "qa branch" in {}.'.format(config_filename))
-
-    return config
-
-
-def abort(error_message):
-    print(error_message)
-    sys.exit(1)
-
-
-def get_confirmation(prompt):
-    confirm = input('{} [y/n] '.format(prompt))
-    return len(confirm) and confirm[0].lower() == 'y'
+        app.abort('You must be in the root directory of a git repository to run this command.')
 
 
 def get_open_pull_request_for_branch(owner, repo, branch):
@@ -155,23 +114,23 @@ def display_commit_style_errors(g, dev_branch):
         print("No style errors found.")
 
 
-def checkout_qa_branch_and_check_dev_branch(g, qa_branch, dev_branch, skip_style_check=False):
-    g.checkout(qa_branch)
+def checkout_base_branch_and_check_dev_branch(g, base_branch, dev_branch, skip_style_check=False):
+    g.checkout(base_branch)
 
     # Determine number of new commits and offer to rebase if greater than one
-    number_of_unmerged_commits = int(g.rev_list('--count', qa_branch + '..' + dev_branch))
+    number_of_unmerged_commits = int(g.rev_list('--count', base_branch + '..' + dev_branch))
     if number_of_unmerged_commits > 1:
         display_unmerged_commits(g, dev_branch)
 
         print('There is more than one new commit present in dev branch.')
-        if get_confirmation('Would you like to interactively rebase?'):
+        if app.get_confirmation('Would you like to interactively rebase?'):
             g.checkout(dev_branch)
             subprocess.call(['git', 'rebase', '-i', 'HEAD~' + str(number_of_unmerged_commits)])
             print('Updating dev branch...')
             g.push('--force')
-            g.checkout(qa_branch)
+            g.checkout(base_branch)
     elif number_of_unmerged_commits == 0:
-        abort('No unmerged commits found.')
+        app.abort('No unmerged commits found.')
 
     # Display unmerged commits in dev branch
     display_unmerged_commits(g, dev_branch)
@@ -181,37 +140,31 @@ def checkout_qa_branch_and_check_dev_branch(g, qa_branch, dev_branch, skip_style
         display_commit_style_errors(g, dev_branch)
 
 
-def check_for_valid_pull_request(config, qa_branch, dev_branch):
+def check_for_valid_pull_request(config, base_branch, dev_branch):
     pr = get_open_pull_request_for_branch(config['github owner'], config['github repo'], dev_branch)
     if not pr:
-        abort('There is no open pull request for this branch.')
-    if pr['base']['ref'] != qa_branch:
-        abort("This pull request's base is {}, not {}.".format(pr['base']['ref'], qa_branch))
+        app.abort('There is no open pull request for this branch.')
+    if pr['base']['ref'] != base_branch:
+        app.abort("This pull request's base is {}, not {}.".format(pr['base']['ref'], base_branch))
 
 
 def main():
     # Parse CLI args and load configuration
-    args = define_parser().parse_args()
-    config = load_config(args.profile)
+    args = app.arg_parser().parse_args()
+    config = app.load_config(args.profile)
 
-    # Set QA branch name from config
-    qa_branch = config['qa branch']
-
-    # Make sure command's being executed in a Git repository
-    try:
-        git.Repo('.').git_dir
-        g = git.cmd.Git('.')
-    except:
-        abort('You must be in the root directory of a git repository to run this command.')
+    # Set QA branch name from config and create git repository handler
+    base_branch = config['base branch']
+    g = get_git_repository_handler()
 
     # Check branch and exit, if in --check mode
     if args.check:
-        checkout_qa_branch_and_check_dev_branch(g, qa_branch, args.dev_branch, args.skip_style_check)
+        checkout_base_branch_and_check_dev_branch(g, base_branch, args.dev_branch, args.skip_style_check)
         sys.exit(0)
 
     # Make sure an open pull request exists for the dev branch
     if 'github owner' in config and 'github repo' in config and not args.skip_pr_check:
-        check_for_valid_pull_request(config, qa_branch, args.dev_branch)
+        check_for_valid_pull_request(config, base_branch, args.dev_branch)
 
     # Show "before notes" from config, if any
     if 'before notes' in config:
@@ -219,7 +172,7 @@ def main():
 
     # Make sure QA branch is up to date
     print('Checking out QA branch...')
-    g.checkout(qa_branch)
+    g.checkout(base_branch)
     print('Updating QA branch...')
     g.pull('--rebase')
 
@@ -227,7 +180,7 @@ def main():
     print('Checking out dev branch..')
     g.checkout(args.dev_branch)
     print('Updating dev branch with work from QA...')
-    g.rebase(qa_branch)
+    g.rebase(base_branch)
 
     # Push rebased version (so it'll get marked as merged later if on
     # Github)
@@ -236,12 +189,12 @@ def main():
 
     # Do actual merge (with fast forward option as dev branch is rebased)
     print('Checking QA branch...')
-    checkout_qa_branch_and_check_dev_branch(g, qa_branch, args.dev_branch)
+    checkout_base_branch_and_check_dev_branch(g, base_branch, args.dev_branch)
 
     # Merge or abort
-    if not get_confirmation('Would you like to merge the above commits?'):
+    if not app.get_confirmation('Would you like to merge the above commits?'):
         g.checkout(args.dev_branch)
-        abort('Merge aborted.')
+        app.abort('Merge aborted.')
 
     print('Merging dev branch...')
     g.merge('--ff-only', args.dev_branch)
