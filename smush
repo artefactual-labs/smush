@@ -1,31 +1,11 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-import app
-import git
-import json
 import subprocess
 import sys
-import urllib2
-
-
-def get_git_repository_handler():
-    # Make sure command's being executed in a Git repository
-    try:
-        git.Repo('.').git_dir
-        return git.cmd.Git('.')
-    except:
-        app.abort('You must be in the root directory of a git repository to run this command.')
-
-
-def get_open_pull_request_for_branch(owner, repo, branch):
-    pr_url = 'https://api.github.com/repos/{}/{}/pulls?state=open'.format(owner, repo)
-    unparsed_result = urllib2.urlopen(pr_url).read()
-    pull_requests = json.loads(unparsed_result)
-
-    for pr in pull_requests:
-        if pr['head']['ref'] == branch:
-            return pr
+import app
+import github
+import topicmerge
 
 
 def display_unmerged_commits(g, dev_branch):
@@ -140,14 +120,6 @@ def checkout_base_branch_and_check_dev_branch(g, base_branch, dev_branch, skip_s
         display_commit_style_errors(g, dev_branch)
 
 
-def check_for_valid_pull_request(config, base_branch, dev_branch):
-    pr = get_open_pull_request_for_branch(config['github owner'], config['github repo'], dev_branch)
-    if not pr:
-        app.abort('There is no open pull request for this branch.')
-    if pr['base']['ref'] != base_branch:
-        app.abort("This pull request's base is {}, not {}.".format(pr['base']['ref'], base_branch))
-
-
 def main():
     # Parse CLI args and load configuration
     args = app.arg_parser().parse_args()
@@ -155,60 +127,44 @@ def main():
 
     # Set QA branch name from config and create git repository handler
     base_branch = config['base branch']
-    g = get_git_repository_handler()
+
+    try:
+        merge = topicmerge.TopicMerge(base_branch, args.dev_branch)
+    except Exception, e:
+        app.abort(str(e))
 
     # Check branch and exit, if in --check mode
     if args.check:
-        checkout_base_branch_and_check_dev_branch(g, base_branch, args.dev_branch, args.skip_style_check)
+        current_branch = merge.active_branch()
+        checkout_base_branch_and_check_dev_branch(merge.g, base_branch, args.dev_branch, args.skip_style_check)
+        merge.g.checkout(current_branch)
         sys.exit(0)
 
     # Make sure an open pull request exists for the dev branch
     if 'github owner' in config and 'github repo' in config and not args.skip_pr_check:
-        check_for_valid_pull_request(config, base_branch, args.dev_branch)
+        github.check_for_valid_pull_request(config, base_branch, args.dev_branch)
 
     # Show "before notes" from config, if any
     if 'before notes' in config:
         print(config['before notes'])
 
-    # Make sure QA branch is up to date
-    print('Checking out QA branch...')
-    g.checkout(base_branch)
-    print('Updating QA branch...')
-    g.pull('--rebase')
-
-    # Rebase dev branch
-    print('Checking out dev branch..')
-    g.checkout(args.dev_branch)
-    print('Updating dev branch with work from QA...')
-    g.rebase(base_branch)
-
-    # Push rebased version (so it'll get marked as merged later if on
-    # Github)
-    print('Pushing updated dev branch...')
-    g.push('--force')
+    merge.rebase_topic_branch()
 
     # Do actual merge (with fast forward option as dev branch is rebased)
     print('Checking QA branch...')
-    checkout_base_branch_and_check_dev_branch(g, base_branch, args.dev_branch)
+    checkout_base_branch_and_check_dev_branch(merge.g, base_branch, args.dev_branch)
 
     # Merge or abort
     if not app.get_confirmation('Would you like to merge the above commits?'):
         g.checkout(args.dev_branch)
         app.abort('Merge aborted.')
 
-    print('Merging dev branch...')
-    g.merge('--ff-only', args.dev_branch)
-
-    # Push merge and delete dev branch
-    print('Pushing QA branch with dev branch merged...')
-    g.push()
-    print('Deleting dev branch...')
-    g.push('origin', ':{}'.format(args.dev_branch))
+    merge.merge_and_cleanup()
 
     # Optionally delete local dev branch
     if args.delete_local:
         print('Deleting local dev branch.')
-        g.branch('-D', args.dev_branch)
+        merge.g.branch('-D', args.dev_branch)
 
     print('Done!')
 
