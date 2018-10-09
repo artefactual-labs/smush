@@ -72,7 +72,7 @@ def main():
 
     try:
         merge = topicmerge.TopicMerge(base_branch, args.dev_branch)
-    except Exception, e:
+    except Exception as e:
         app.abort(str(e))
 
     # Check branch and exit, if in --check mode
@@ -98,7 +98,7 @@ def main():
 
     # Merge or abort
     if not app.get_confirmation('Would you like to merge the above commits?'):
-        g.checkout(args.dev_branch)
+        merge.g.checkout(args.dev_branch)
         app.abort('Merge aborted.')
 
     merge.merge_and_cleanup()
