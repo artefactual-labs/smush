@@ -1,16 +1,15 @@
 from __future__ import print_function
 import json
-import subprocess
-import sys
 import urllib2
 
 
 def check_for_valid_pull_request(config, base_branch, dev_branch):
     pr = get_open_pull_request_for_branch(config['github owner'], config['github repo'], dev_branch)
     if not pr:
-        app.abort('There is no open pull request for this branch.')
+        raise Exception('There is no open pull request for this branch.')
     if pr['base']['ref'] != base_branch:
-        app.abort("This pull request's base is {}, not {}.".format(pr['base']['ref'], base_branch))
+        error_message = "This pull request's base is {}, not {}.".format(pr['base']['ref'], base_branch)
+        raise Exception(error_message)
 
 
 def get_open_pull_request_for_branch(owner, repo, branch):

@@ -9,15 +9,14 @@ import github
 import topicmerge
 
 
-def display_unmerged_commits(g, dev_branch):
+def display_unmerged_commits(merge):
     print()
-    print(g.log('..{}'.format(dev_branch)))
+    print(merge.unmerged_log())
     print()
 
 
-def display_commit_style_errors(g, dev_branch):
-    log_output = g.log("..{}".format(dev_branch))
-    parsed_log = git_log_style_checker.parse_and_check_git_log_output(log_output)
+def display_commit_style_errors(merge):
+    parsed_log = git_log_style_checker.parse_and_check_git_log_output(merge.unmerged_log())
 
     errors_found = False
     for commit in parsed_log:
@@ -36,30 +35,29 @@ def display_commit_style_errors(g, dev_branch):
         print("No style errors found.")
 
 
-def checkout_base_branch_and_check_dev_branch(g, base_branch, dev_branch, skip_style_check=False):
-    g.checkout(base_branch)
+def check_topic_branch_commits(merge, skip_style_check=False):
+    starting_branch = merge.active_branch()
 
     # Determine number of new commits and offer to rebase if greater than one
-    number_of_unmerged_commits = int(g.rev_list('--count', base_branch + '..' + dev_branch))
-    if number_of_unmerged_commits > 1:
-        display_unmerged_commits(g, dev_branch)
+    if merge.unmerged_total() > 1:
+        display_unmerged_commits(merge)
 
         print('There is more than one new commit present in dev branch.')
         if app.get_confirmation('Would you like to interactively rebase?'):
-            g.checkout(dev_branch)
-            subprocess.call(['git', 'rebase', '-i', 'HEAD~' + str(number_of_unmerged_commits)])
+            merge.g.checkout(merge.topic_branch)
+            subprocess.call(['git', 'rebase', '-i', 'HEAD~' + str(merge.unmerged_total())])
             print('Updating dev branch...')
-            g.push('--force')
-            g.checkout(base_branch)
-    elif number_of_unmerged_commits == 0:
+            merge.g.push('--force')
+            merge.g.checkout(starting_branch)
+    elif merge.unmerged_total() == 0:
         app.abort('No unmerged commits found.')
 
     # Display unmerged commits in dev branch
-    display_unmerged_commits(g, dev_branch)
+    display_unmerged_commits(merge)
 
     # Show commit style errors
     if not skip_style_check:
-        display_commit_style_errors(g, dev_branch)
+        display_commit_style_errors(merge)
 
 
 def main():
@@ -67,34 +65,33 @@ def main():
     args = app.arg_parser().parse_args()
     config = app.load_config(args.profile)
 
-    # Set QA branch name from config and create git repository handler
-    base_branch = config['base branch']
-
+    # Initializee topic branch merge handler
     try:
-        merge = topicmerge.TopicMerge(base_branch, args.dev_branch)
+        merge = topicmerge.TopicMerge(config['base branch'], args.dev_branch, delete_local=args.delete_local)
     except Exception as e:
         app.abort(str(e))
 
     # Check branch and exit, if in --check mode
     if args.check:
-        current_branch = merge.active_branch()
-        checkout_base_branch_and_check_dev_branch(merge.g, base_branch, args.dev_branch, args.skip_style_check)
-        merge.g.checkout(current_branch)
+        check_topic_branch_commits(merge, args.skip_style_check)
         sys.exit(0)
 
     # Make sure an open pull request exists for the dev branch
     if 'github owner' in config and 'github repo' in config and not args.skip_pr_check:
-        github.check_for_valid_pull_request(config, base_branch, args.dev_branch)
+        try:
+            github.check_for_valid_pull_request(config, config['base branch'], args.dev_branch)
+        except Exception as e:
+            app.abort(str(e))
 
     # Show "before notes" from config, if any
     if 'before notes' in config:
         print(config['before notes'])
 
-    merge.rebase_topic_branch()
+    merge.update_base_and_rebase_topic()
 
-    # Do actual merge (with fast forward option as dev branch is rebased)
+    # Check number of commits and commit style
     print('Checking QA branch...')
-    checkout_base_branch_and_check_dev_branch(merge.g, base_branch, args.dev_branch)
+    check_topic_branch_commits(merge)
 
     # Merge or abort
     if not app.get_confirmation('Would you like to merge the above commits?'):
@@ -102,11 +99,6 @@ def main():
         app.abort('Merge aborted.')
 
     merge.merge_and_cleanup()
-
-    # Optionally delete local dev branch
-    if args.delete_local:
-        print('Deleting local dev branch.')
-        merge.g.branch('-D', args.dev_branch)
 
     print('Done!')
 
