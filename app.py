@@ -10,7 +10,7 @@ def arg_parser():
     parser = argparse.ArgumentParser(
         description='Automate merging of feature branches.')
 
-    parser.add_argument('dev_branch', metavar='dev_branch', type=str,
+    parser.add_argument('topic_branch', metavar='topic_branch', type=str,
                         help='feature branch to merge')
     parser.add_argument('--check', action='store_true', default=False)
     parser.add_argument('--skip-style-check', action='store_true')
