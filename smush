@@ -3,9 +3,9 @@
 from __future__ import print_function
 import subprocess
 import sys
+import github
 import app
 import git_log_style_checker
-import github
 import topicmerge
 
 
@@ -78,10 +78,24 @@ def main():
 
     # Make sure an open pull request exists for the dev branch
     if 'github owner' in config and 'github repo' in config and not args.skip_pr_check:
+        # Prepare to access Github repository
         try:
-            github.check_for_valid_pull_request(config, config['base branch'], args.dev_branch)
-        except Exception as e:
-            app.abort(str(e))
+            repo = github.Github().get_repo("{}/{}".format(config['github owner'], config['github repo']))
+        except github.UnknownObjectException:
+            app.abort('Github repository not found.')
+
+        # Cycle through pulls request to find the first one for the topic branch
+        pr = None
+        for pull in repo.get_pulls(state='open'):
+            if pull.head.ref == args.topic_branch:
+                pr = pull
+
+        # Report an error finding an appropriate pull request
+        if not pr:
+            app.abort('Could not find pull request for this topic branch.')
+        elif pr.base.ref != config['base branch']:
+            error_message = "The pull request's base is {}, not {}.".format(pr.base.ref, config['base branch'])
+            app.abort(error_message)
 
     # Show "before notes" from config, if any
     if 'before notes' in config:
