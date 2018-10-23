@@ -5,8 +5,8 @@ import subprocess
 import sys
 import github
 import app
-import git_log_style_checker
-import topicmerge
+from git_log_style_checker import GitLogStyleChecker
+from topicmerge import TopicMerge
 
 
 def display_unmerged_commits(merge):
@@ -37,7 +37,8 @@ def check_topic_branch_commits(merge, skip_style_check=False):
 
     # Show commit style errors
     if not skip_style_check:
-        print(git_log_style_checker.summarize_style_errors_in_commit_log(merge.unmerged_log()))
+        checker = GitLogStyleChecker(merge.unmerged_log())
+        print(checker.summarize_style_errors())
 
 
 def main():
@@ -47,7 +48,7 @@ def main():
 
     # Initializee topic branch merge handler
     try:
-        merge = topicmerge.TopicMerge(config['base branch'], args.topic_branch, delete_local=args.delete_local)
+        merge = TopicMerge(config['base branch'], args.topic_branch, delete_local=args.delete_local)
     except Exception as e:
         app.abort(str(e))
 
