@@ -15,26 +15,6 @@ def display_unmerged_commits(merge):
     print()
 
 
-def display_commit_style_errors(merge):
-    parsed_log = git_log_style_checker.parse_and_check_git_log_output(merge.unmerged_log())
-
-    errors_found = False
-    for commit in parsed_log:
-        if "errors" in commit and len(commit["errors"]):
-            errors_found = True
-
-            print("Style error(s) found in commit {}:".format(commit["hash"]))
-            print()
-
-            for line in commit["errors"]:
-                print("    {}".format(line))
-
-            print()
-
-    if not errors_found:
-        print("No style errors found.")
-
-
 def check_topic_branch_commits(merge, skip_style_check=False):
     starting_branch = merge.active_branch()
 
@@ -57,7 +37,7 @@ def check_topic_branch_commits(merge, skip_style_check=False):
 
     # Show commit style errors
     if not skip_style_check:
-        display_commit_style_errors(merge)
+        print(git_log_style_checker.summarize_style_errors_in_commit_log(merge.unmerged_log()))
 
 
 def main():

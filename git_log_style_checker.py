@@ -55,3 +55,23 @@ def check_commit_and_note_style_errors(commit):
     # Add any errors to commit and append
     if len(errors):
         commit["errors"] = errors
+
+
+def summarize_style_errors_in_commit_log(commit_log_text):
+    parsed_log = parse_and_check_git_log_output(commit_log_text)
+
+    summary = ''
+
+    for commit in parsed_log:
+        if "errors" in commit and len(commit["errors"]):
+            summary += "Style error(s) found in commit {}:\n\n".format(commit["hash"])
+
+            for line in commit["errors"]:
+                summary += "    {}\n".format(line)
+
+            summary += "\n"
+
+    if summary == '':
+        summary += "No style errors found.\n"
+
+    return summary
