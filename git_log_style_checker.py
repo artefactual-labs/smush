@@ -60,10 +60,9 @@ class GitLogStyleChecker:
             commit["errors"] = errors
 
     def summarize_style_errors(self):
-        #parsed_log = self.parse_and_check_git_log_output(commit_log_text)
-
         summary = ''
 
+        # Create text summary of style errors
         for commit in self.commits:
             if "errors" in commit and len(commit["errors"]):
                 summary += "Style error(s) found in commit {}:\n\n".format(commit["hash"])
