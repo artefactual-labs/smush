@@ -22,7 +22,8 @@ Does the following:
 
 1. Optionally verify (depending on config file settings) if open pull request
   exists for topic branch
-2. Optionally verify (depending on config file settings) if pull request base branch matches configuration
+2. Optionally verify (depending on config file settings) if pull request base
+  branch matches configuration
 3. Optionally shows text reminders (from config file) before merge
 4. Updates base branch
 5. Rebases topic branch using base branch
@@ -62,16 +63,17 @@ Example:
 
     base branch: qa/2.5.x
 
-Setting `github owner` and `github repo` in your configuration file can, optionally, enable you
-to have smush check to make sure an open pull request exists for the topic branch.
+Setting `github owner` and `github repo` in your configuration file can,
+optionally, enable you to have smush check to make sure an open pull request
+exists for the topic branch.
 
 Setting `before notes` in your configuration file can, optionally, display
 notes/reminders before you merge. Likewise, setting `after notes` can display
 notes/reminders after you merge.
 
 The `--profile` option can be used to load an alternative configuration. Using
-`--profile=backport`, for example, would result in `$HOME/.smush-backport.yml` being
-used as a configuration file.
+`--profile=backport`, for example, would result in `$HOME/.smush-backport.yml`
+being used as a configuration file.
 
 Style checking
 --------------
