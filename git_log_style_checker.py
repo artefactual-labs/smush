@@ -1,13 +1,29 @@
 class GitLogStyleChecker:
     def __init__(self, git_log_output):
+        """Create git log style checker instance.
+
+        Args:
+            git_log_output (str): Git log output to parse and check.
+        """
         self.commits = self.parse_and_check_git_log_output(git_log_output)
 
-    def parse_and_check_git_log_output(self, log):
+    def parse_and_check_git_log_output(self, git_log_output):
+        """Return array of commit data and related errors.
+
+        Parse git log output and return array of data relating to commits and
+        any style errors found.
+
+        Args:
+            git_log_output (str): Git log output to parse and check.
+
+        Returns:
+            array: Commit information.
+        """
         commits = []
         commit = {}
         blank_lines = 0
 
-        for line in log.split("\n"):
+        for line in git_log_output.split("\n"):
             if line.startswith("commit "):
                 # Note errors, append commit, reset bookkeeping variables
                 if commit != {}:
@@ -38,6 +54,13 @@ class GitLogStyleChecker:
         return commits
 
     def check_commit_and_note_style_errors(self, commit):
+        """Add style error information to dict containing commit data.
+
+        Error information, if found, is put into the "errors" key.
+
+        Args:
+            commit (dict): Commit data containing commit header and body.
+        """
         errors = []
 
         # Check header
@@ -60,6 +83,11 @@ class GitLogStyleChecker:
             commit["errors"] = errors
 
     def summarize_style_errors(self):
+        """Return text summary of errors found in commits parsed from the log.
+
+        Returns:
+            str: Text summary.
+        """
         summary = ''
 
         # Create text summary of style errors
