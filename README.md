@@ -20,7 +20,8 @@ Usage: `smush <topic branch>`
 
 Does the following:
 
-1. Optionally verify (depending on config file settings) if open pull request exists for topic branch
+1. Optionally verify (depending on config file settings) if open pull request
+  exists for topic branch
 2. Optionally verify (depending on config file settings) if pull request base branch matches configuration
 3. Optionally shows text reminders (from config file) before merge
 4. Updates base branch
