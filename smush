@@ -8,6 +8,19 @@ from topicmerge import TopicMerge
 
 
 def main():
+    """Automates merging of topic branches.
+
+        usage: smush [-h] [--check] [--skip-style-check] [--skip-pr-check]
+                     [--delete-local] [--profile PROFILE]
+                     topic_branch
+
+    This script automates steps required to cleanly merge a topic branch into a
+    base branch. No merge commits are made. Before merging, the topic branch is
+    rebased so it can be merged using `--ff-only` then pushed.
+
+    If merging this way and using GitHub, and a pull request exists for the topic 
+    branch, the pull request will be automatically marked as merged and closed.
+    """
     # Parse CLI args and load configuration
     args = app.arg_parser().parse_args()
     config = app.load_config(args.profile)

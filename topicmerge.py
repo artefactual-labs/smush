@@ -4,6 +4,14 @@ import git
 
 class TopicMerge:
     def __init__(self, base_branch, topic_branch, delete_local=False):
+        """Create topic branch merge helper instance.
+
+        Args:
+            base_branch (str): Base branch.
+            topic_branch (str): Topic branch.
+            delete_local (bool, optional): Whether or not to delete topic
+                branch after merge.
+        """
         self.base_branch = base_branch
         self.topic_branch = topic_branch
         self.delete_local = delete_local
@@ -17,6 +25,7 @@ class TopicMerge:
             raise Exception('Not a valid git repository.')
 
     def update_base_and_rebase_topic(self):
+        """Update base branch and rebase topic branch."""
         # Make sure base branch is up to date
         print('Checking out base branch...')
         self.git.checkout(self.base_branch)
@@ -35,6 +44,7 @@ class TopicMerge:
         self.git.push('--force')
 
     def merge_and_cleanup(self):
+        """Merge topic branch then delete remotely and, optionally, locally."""
         print('Checking out base branch and merging topic branch...')
         self.git.checkout(self.base_branch)
         self.git.merge('--ff-only', self.topic_branch)
@@ -51,10 +61,13 @@ class TopicMerge:
             self.git.branch('-D', self.topic_branch)
 
     def active_branch(self):
+        """Return name of active branch."""
         return git.Repo(path='.', search_parent_directories=True).active_branch.name
 
     def unmerged_log(self):
+        """Return Git log output for unmerged commits."""
         return self.git.log('{}..{}'.format(self.base_branch, self.topic_branch))
 
     def unmerged_total(self):
+        """Return number of unmerged commits."""
         return int(self.git.rev_list('--count', '{}..{}'.format(self.base_branch, self.topic_branch)))

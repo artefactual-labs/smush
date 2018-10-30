@@ -9,6 +9,7 @@ from git_log_style_checker import GitLogStyleChecker
 
 
 def arg_parser():
+    """Return ArgumentParser for this application."""
     parser = argparse.ArgumentParser(
         description='Automate merging of feature branches.')
 
@@ -24,6 +25,14 @@ def arg_parser():
 
 
 def load_config(profile):
+    """Return configuration, from YAML file, for this application.
+
+    Args:
+        profile (str, optional): name for profile (allows multiple configurations).
+
+    Returns:
+        dict: Configuration information.
+    """
     # Assemble configuration file name
     config_filename = '.smush'
     if profile:
@@ -46,6 +55,12 @@ def load_config(profile):
 
 
 def check_topic_branch_commits(merge, skip_style_check=False):
+    """Check topic branch commit(s) for issues.
+
+    Args:
+        merge (TopicMerge): Abstraction to make it easier to work with topic branch.
+        skip_style_check (bool, optional): Whether to skip style check.
+    """
     starting_branch = merge.active_branch()
 
     # Determine number of new commits and offer to rebase if greater than one
@@ -72,16 +87,19 @@ def check_topic_branch_commits(merge, skip_style_check=False):
 
 
 def display_unmerged_commits(merge):
+    """Print unmerged commits with a blank line above and below."""
     print()
     print(merge.unmerged_log())
     print()
 
 
 def abort(error_message):
+    """Print error message and exit with error code 1."""
     print(error_message)
     sys.exit(1)
 
 
 def get_confirmation(prompt):
+    """Ask use to confirm an action."""
     confirm = input('{} [y/n] '.format(prompt))
     return len(confirm) and confirm[0].lower() == 'y'
