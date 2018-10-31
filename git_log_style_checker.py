@@ -3,7 +3,7 @@ class GitLogStyleChecker:
         """Create git log style checker instance.
 
         Args:
-            git_log_output (str): Git log output to parse and check.
+            git_log_output (str): Git log (no flags set) output to parse/check.
         """
         self.commits = self.parse_and_check_git_log_output(git_log_output)
 
