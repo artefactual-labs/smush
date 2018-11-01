@@ -4,6 +4,7 @@ import argparse
 import os
 import subprocess
 import sys
+import github
 import yaml
 from git_log_style_checker import GitLogStyleChecker
 
@@ -84,6 +85,27 @@ def check_topic_branch_commits(merge, skip_style_check=False):
     if not skip_style_check:
         checker = GitLogStyleChecker(merge.unmerged_log())
         print(checker.summarize_style_errors())
+
+
+def check_for_pull_request(config, topic_branch):
+    # Prepare to access Github repository
+    try:
+        repo = github.Github().get_repo("{}/{}".format(config['github owner'], config['github repo']))
+    except github.UnknownObjectException:
+        abort('Github repository not found.')
+
+    # Cycle through pulls request to find the first one for the topic branch
+    pr = None
+    for pull in repo.get_pulls(state='open'):
+        if pull.head.ref == topic_branch:
+            pr = pull
+
+    # Report an error finding an appropriate pull request
+    if not pr:
+        abort('Could not find pull request for this topic branch.')
+    elif pr.base.ref != config['base branch']:
+        error_message = "The pull request's base is {}, not {}.".format(pr.base.ref, config['base branch'])
+        abort(error_message)
 
 
 def display_unmerged_commits(merge):
