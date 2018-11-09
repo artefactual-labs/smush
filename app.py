@@ -46,11 +46,11 @@ def load_config(profile):
     try:
         config = yaml.safe_load(open(config_path))
     except:
-        abort('Unable to load ~/{}: does it exist?'.format(config_filename))
+        raise Exception('Unable to load ~/{}: does it exist?'.format(config_filename))
 
     # Verify QA branch has been set in the config file
     if 'base branch' not in config:
-        abort('Please set "base branch" in {}.'.format(config_filename))
+        raise Exception('Please set "base branch" in {}.'.format(config_filename))
 
     return config
 
@@ -76,7 +76,7 @@ def check_topic_branch_commits(merge, skip_style_check=False):
             merge.git.push('--force')
             merge.git.checkout(starting_branch)
     elif merge.unmerged_total() == 0:
-        abort('No unmerged commits found.')
+        raise Exception('No unmerged commits found.')
 
     # Display unmerged commits in dev branch
     display_unmerged_commits(merge)
@@ -88,11 +88,21 @@ def check_topic_branch_commits(merge, skip_style_check=False):
 
 
 def check_for_pull_request(config, topic_branch):
+    """ Check to make sure pull request for topic branch exists on Github.
+
+    Uses Github owner/repository information and base branch from the
+    application configuration to check Github to make sure an open pull
+    request exists for the topic branch against the appropriate base branch.
+
+    Args:
+        config (dict): Application configuration.
+        topic_branch (str): Topic branch.
+    """
     # Prepare to access Github repository
     try:
         repo = github.Github().get_repo("{}/{}".format(config['github owner'], config['github repo']))
     except github.UnknownObjectException:
-        abort('Github repository not found.')
+        raise Exception('Github repository not found.')
 
     # Cycle through pulls request to find the first one for the topic branch
     pr = None
@@ -102,10 +112,10 @@ def check_for_pull_request(config, topic_branch):
 
     # Report an error finding an appropriate pull request
     if not pr:
-        abort('Could not find pull request for this topic branch.')
+        raise Exception('Could not find pull request for this topic branch.')
     elif pr.base.ref != config['base branch']:
         error_message = "The pull request's base is {}, not {}.".format(pr.base.ref, config['base branch'])
-        abort(error_message)
+        raise Exception(error_message)
 
 
 def display_unmerged_commits(merge):
@@ -113,12 +123,6 @@ def display_unmerged_commits(merge):
     print()
     print(merge.unmerged_log())
     print()
-
-
-def abort(error_message):
-    """Print error message and exit with error code 1."""
-    print(error_message)
-    sys.exit(1)
 
 
 def get_confirmation(prompt):

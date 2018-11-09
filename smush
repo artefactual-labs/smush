@@ -6,7 +6,7 @@ import app
 from topicmerge import TopicMerge
 
 
-def main():
+def main(args, config):
     """Automates merging of topic branches.
 
         usage: smush [-h] [--check] [--skip-style-check] [--skip-pr-check]
@@ -19,16 +19,13 @@ def main():
 
     If merging this way and using GitHub, and a pull request exists for the topic
     branch, the pull request will be automatically marked as merged and closed.
-    """
-    # Parse CLI args and load configuration
-    args = app.arg_parser().parse_args()
-    config = app.load_config(args.profile)
 
+    Args:
+        args (argparse.Namespace): Command-line arguments and options.
+        config (dict): Application configuration.
+    """
     # Initializee topic branch merge handler
-    try:
-        merge = TopicMerge(config['base branch'], args.topic_branch, delete_local=args.delete_local)
-    except Exception as e:
-        app.abort(str(e))
+    merge = TopicMerge(config['base branch'], args.topic_branch, delete_local=args.delete_local)
 
     # Check branch and exit, if in --check mode
     if args.check:
@@ -52,7 +49,8 @@ def main():
     # Merge or abort
     if not app.get_confirmation('Would you like to merge the above commits?'):
         merge.git.checkout(args.topic_branch)
-        app.abort('Merge aborted.')
+        print('Merge aborted.')
+        sys.exit(0)
 
     merge.merge_and_cleanup()
 
@@ -64,4 +62,12 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        # Parse CLI args and load configuration
+        args = app.arg_parser().parse_args()
+        config = app.load_config(args.profile)
+
+        main(args, config)
+    except Exception as e:
+        print(str(e))
+        sys.exit(1)
