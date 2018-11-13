@@ -31,6 +31,11 @@ def load_config(profile):
     Args:
         profile (str, optional): name for profile (allows multiple configurations).
 
+    Raises:
+        Exception: If not able to read or parse the configuration file for any
+                   reason or if "base branch" isn't set in the configuration
+                   file.
+
     Returns:
         dict: Configuration information.
     """
@@ -61,6 +66,9 @@ def check_topic_branch_commits(merge, skip_style_check=False):
     Args:
         merge (TopicMerge): Abstraction to make it easier to work with topic branch.
         skip_style_check (bool, optional): Whether to skip style check.
+
+    Raises:
+        Exception if not unmerged commits are found.
     """
     starting_branch = merge.active_branch()
 
@@ -97,6 +105,11 @@ def check_for_pull_request(config, topic_branch):
     Args:
         config (dict): Application configuration.
         topic_branch (str): Topic branch.
+
+    Raises:
+        Exception: if the Github repository can't be found, a pull request
+                   can't be found, or the pull request's base branch isn't
+                   correct.
     """
     # Prepare to access Github repository
     try:
