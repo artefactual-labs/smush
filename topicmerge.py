@@ -23,7 +23,7 @@ class TopicMerge:
         except git.exc.InvalidGitRepositoryError:
             raise Exception('Not a valid git repository.')
 
-    def update_base_and_rebase_topic(self):
+    def update_base_branch(self):
         """Update base branch and rebase topic branch."""
         # Make sure base branch is up to date
         print('Checking out base branch...')
@@ -31,6 +31,8 @@ class TopicMerge:
         print('Updating base branch...')
         self.git.pull('--rebase')
 
+    def rebase_topic_branch_and_push(self):
+        """Rebase topic branch with work from base branch and push."""
         # Rebase topic branch
         print('Checking out topic branch..')
         self.git.checkout(self.topic_branch)
@@ -51,17 +53,37 @@ class TopicMerge:
         # Push merge and delete topic branch
         print('Pushing base branch with topic branch merged...')
         self.git.push()
-        print('Deleting topic branch...')
+        print('Deleting remote topic branch...')
         self.git.push('origin', ':{}'.format(self.topic_branch))
 
         # Optionally delete local topic branch
         if self.delete_local:
-            print('Deleting local topic branch.')
+            print('Deleting local topic branch...')
             self.git.branch('-D', self.topic_branch)
+
+    def check_out_branch_from_remote(self, branch):
+        """Check out local version of a remote branch.
+
+        Args:
+            branch (str): Name of remote branch to check out.
+        """
+        base_branch_remote = self.git.config('--get', 'branch.{}.remote'.format(self.base_branch))
+        self.git.checkout('-b', branch, '{}/{}'.format(base_branch_remote, branch))
 
     def active_branch(self):
         """Return name of active branch."""
         return self.repo.active_branch.name
+
+    def branch_exists(self, branch):
+        """Check whether a branch exists in the current repository.
+
+        Args:
+            branch (str): Name of branch that may or may not exist.
+
+        Returns:
+            bool: True if branch exists, otherwise false.
+        """
+        return branch in self.repo.branches
 
     def unmerged_log(self):
         """Return Git log output for unmerged commits."""
