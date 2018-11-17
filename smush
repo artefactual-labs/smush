@@ -47,7 +47,7 @@ def main(args, config):
         if app.get_confirmation('Topic branch not checked out locally. Would you like to do that?'):
             merge.check_out_branch_from_remote(args.topic_branch)
         else:
-            print('Aborting merge.')
+            print('Merge aborted.')
             sys.exit(0)
 
     merge.rebase_topic_branch_and_push()
