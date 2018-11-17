@@ -18,8 +18,7 @@ class TopicMerge:
 
         try:
             # Throws error if not in a Git repository
-            git.Repo(path='.', search_parent_directories=True).git_dir
-
+            self.repo = git.Repo(path='.', search_parent_directories=True)
             self.git = git.cmd.Git('.')
         except git.exc.InvalidGitRepositoryError:
             raise Exception('Not a valid git repository.')
@@ -62,7 +61,7 @@ class TopicMerge:
 
     def active_branch(self):
         """Return name of active branch."""
-        return git.Repo(path='.', search_parent_directories=True).active_branch.name
+        return self.repo.active_branch.name
 
     def unmerged_log(self):
         """Return Git log output for unmerged commits."""
