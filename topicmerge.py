@@ -64,14 +64,10 @@ class TopicMerge:
             print('Deleting local topic branch...')
             self.git.branch('-D', self.topic_branch)
 
-    def check_out_branch_from_remote(self, branch):
-        """Check out local version of a remote branch.
-
-        Args:
-            branch (str): Name of remote branch to check out.
-        """
+    def check_out_topic_branch_from_remote(self):
+        """Check out local version of topic branch."""
         base_branch_remote = self.git.config('--get', 'branch.{}.remote'.format(self.base_branch))
-        self.git.checkout('-b', branch, '{}/{}'.format(base_branch_remote, branch))
+        self.git.checkout('-b', self.topic_branch, '{}/{}'.format(base_branch_remote, self.topic_branch))
 
     def active_branch(self):
         """Return name of active branch."""
