@@ -53,7 +53,7 @@ def load_config(profile):
     except:
         raise Exception('Unable to load ~/{}: does it exist?'.format(config_filename))
 
-    # Verify QA branch has been set in the config file
+    # Verify base branch has been set in the config file
     if 'base branch' not in config:
         raise Exception('Please set "base branch" in {}.'.format(config_filename))
 

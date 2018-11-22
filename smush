@@ -53,7 +53,7 @@ def main(args, config):
     merge.rebase_topic_branch_and_push()
 
     # Check number of commits and commit style
-    print('Checking QA branch...')
+    print('Checking commit quantity/style in topic branch...')
     app.check_topic_branch_commits(merge)
 
     # Merge or abort
