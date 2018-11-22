@@ -27,11 +27,6 @@ def main(args, config):
     # Initialize topic branch merge handler
     merge = TopicMerge(config['base branch'], args.topic_branch, delete_local=args.delete_local)
 
-    # Abort if base branch doesn't exist locally
-    if not merge.branch_exists(config['base branch']):
-        print("Merge aborted: base branch '{}' not checked out locally.".format(config['base branch']))
-        sys.exit(1)
-
     # Check branch and exit, if in --check mode
     if args.check:
         app.check_topic_branch_commits(merge, args.skip_style_check)

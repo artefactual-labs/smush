@@ -23,6 +23,9 @@ class TopicMerge:
         except git.exc.InvalidGitRepositoryError:
             raise Exception('Not a valid git repository.')
 
+        if not self.branch_exists(base_branch):
+            raise Exception("Base branch '{}' not checked out locally.".format(base_branch))
+
     def update_base_branch(self):
         """Update base branch and rebase topic branch."""
         # Make sure base branch is up to date
