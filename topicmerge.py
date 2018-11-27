@@ -23,7 +23,7 @@ class TopicMerge:
         except git.exc.InvalidGitRepositoryError:
             raise Exception('Not a valid git repository.')
 
-        if not self.branch_exists(base_branch):
+        if not self.local_branch_exists(base_branch):
             raise Exception("Base branch '{}' not checked out locally.".format(base_branch))
 
     def update_base_branch(self):
@@ -66,15 +66,18 @@ class TopicMerge:
 
     def check_out_topic_branch_from_remote(self):
         """Check out local version of topic branch."""
-        base_branch_remote = self.git.config('--get', 'branch.{}.remote'.format(self.base_branch))
-        self.git.checkout('-b', self.topic_branch, '{}/{}'.format(base_branch_remote, self.topic_branch))
+        self.git.checkout('-b', self.topic_branch, '{}/{}'.format(self.base_branch_remote(), self.topic_branch))
 
     def active_branch(self):
         """Return name of active branch."""
         return self.repo.active_branch.name
 
-    def branch_exists(self, branch):
-        """Check whether a branch exists in the current repository.
+    def base_branch_remote(self):
+        """Return remote of base branch."""
+        return self.git.config('--get', 'branch.{}.remote'.format(self.base_branch))
+
+    def local_branch_exists(self, branch):
+        """Check whether a branch exists locally in the current repository.
 
         Args:
             branch (str): Name of branch that may or may not exist.
@@ -83,6 +86,21 @@ class TopicMerge:
             bool: True if branch exists, otherwise false.
         """
         return branch in self.repo.branches
+
+    def remote_branch_exists(self, branch):
+        """Check whether a branch exists remotely using base branch's origin.
+
+        Args:
+            branch (str): Name of branch that may or may not exist.
+
+        Returns:
+            bool: True if branch exists, otherwise false.
+        """
+        try:
+            self.git.show_ref("refs/remotes/{}/{}".format(self.base_branch_remote(), branch))
+            return True
+        except git.exc.GitCommandError:
+            return False
 
     def unmerged_log(self):
         """Return Git log output for unmerged commits."""

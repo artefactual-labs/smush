@@ -40,10 +40,14 @@ def main(args, config):
     if 'before notes' in config:
         print(config['before notes'])
 
-    merge.update_base_branch()
+    if merge.remote_branch_exists(config['base branch']):
+        merge.update_base_branch()
+    else:
+        print("Merge aborted: the base branch does't exist remotely.")
+        sys.exit(1)
 
     # Check out topic branch locally, if need be
-    if not merge.branch_exists(args.topic_branch):
+    if not merge.local_branch_exists(args.topic_branch):
         if app.get_confirmation('Topic branch not checked out locally. Would you like to do that?'):
             merge.check_out_topic_branch_from_remote()
         else:
