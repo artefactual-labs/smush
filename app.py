@@ -125,7 +125,7 @@ def check_for_pull_request(config, topic_branch):
 
     # Report an error finding an appropriate pull request
     if not pr:
-        raise Exception('Could not find pull request for this topic branch.')
+        raise Exception('Could not find pull request for this topic branch. Use --skip-pr-check option to skip.')
     elif pr.base.ref != config['base branch']:
         error_message = "The pull request's base is {}, not {}.".format(pr.base.ref, config['base branch'])
         raise Exception(error_message)
