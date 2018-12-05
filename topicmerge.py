@@ -3,12 +3,12 @@ import git
 
 
 class TopicMerge:
-    def __init__(self, base_branch, topic_branch, delete_local=False):
+    def __init__(self, base_branch, topic_branch=None, delete_local=False):
         """Create topic branch merge helper instance.
 
         Args:
             base_branch (str): Base branch.
-            topic_branch (str): Topic branch.
+            topic_branch (str, optional): Topic branch.
             delete_local (bool, optional): Whether or not to delete topic
                 branch after merge.
         """
@@ -23,8 +23,15 @@ class TopicMerge:
         except git.exc.InvalidGitRepositoryError:
             raise Exception('Not a valid git repository.')
 
+        if not topic_branch:
+            self.topic_branch = self.active_branch()
+            print("Using active branch '{}' for topic branch.".format(self.topic_branch))
+
         if not self.local_branch_exists(base_branch):
             raise Exception("Base branch '{}' not checked out locally.".format(base_branch))
+
+        if self.topic_branch == self.base_branch:
+            raise Exception("Topic branch and base branch shouldn't be the same.")
 
     def update_base_branch(self):
         """Update base branch and rebase topic branch."""

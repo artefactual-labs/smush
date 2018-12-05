@@ -11,7 +11,7 @@ def main(args, config):
 
         usage: smush [-h] [--check] [--skip-style-check] [--skip-pr-check]
                      [--delete-local] [--profile PROFILE]
-                     topic_branch
+                     [topic_branch]
 
     This script automates steps required to cleanly merge a topic branch into a
     base branch. No merge commits are made. Before merging, the topic branch is
@@ -20,12 +20,14 @@ def main(args, config):
     If merging this way and using GitHub, and a pull request exists for the topic
     branch, the pull request will be automatically marked as merged and closed.
 
+    If no topic branch is specified, the active branch will be used.
+
     Args:
         args (argparse.Namespace): Command-line arguments and options.
         config (dict): Application configuration.
     """
     # Initialize topic branch merge handler
-    merge = TopicMerge(config['base branch'], args.topic_branch, delete_local=args.delete_local)
+    merge = TopicMerge(config['base branch'], topic_branch=args.topic_branch, delete_local=args.delete_local)
 
     # Check branch and exit, if in --check mode
     if args.check:
@@ -34,7 +36,7 @@ def main(args, config):
 
     # Make sure an open pull request exists for the dev branch
     if 'github owner' in config and 'github repo' in config and not args.skip_pr_check:
-        app.check_for_pull_request(config, args.topic_branch)
+        app.check_for_pull_request(config, merge.topic_branch)
 
     # Show "before notes" from config, if any
     if 'before notes' in config:
@@ -47,7 +49,7 @@ def main(args, config):
         sys.exit(1)
 
     # Check out topic branch locally, if need be
-    if not merge.local_branch_exists(args.topic_branch):
+    if not merge.local_branch_exists(merge.topic_branch):
         if app.get_confirmation('Topic branch not checked out locally. Would you like to do that?'):
             merge.check_out_topic_branch_from_remote()
         else:
@@ -62,7 +64,7 @@ def main(args, config):
 
     # Merge or abort
     if not app.get_confirmation('Would you like to merge the above commits?'):
-        merge.git.checkout(args.topic_branch)
+        merge.git.checkout(merge.topic_branch)
         print('Merge aborted.')
         sys.exit(0)
 

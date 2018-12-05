@@ -16,7 +16,7 @@ branch, the pull request will be automatically marked as merged and closed.
 Functionality
 -------------
 
-Usage: `smush <topic branch>`
+Usage: `smush [topic branch]`
 
 Does the following:
 
@@ -37,6 +37,8 @@ Does the following:
 13. Deletes topic branch
 14. Optionally delete local topic branch
 15. Optionally shows reminders (from config file) after merge
+
+If no topic branch is specified, the active branch will be used.
 
 The `--skip-pr-check` option skips step 2 of the above sequence.
 

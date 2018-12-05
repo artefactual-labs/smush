@@ -3,7 +3,6 @@ from builtins import input
 import argparse
 import os
 import subprocess
-import sys
 import github
 import yaml
 from git_log_style_checker import GitLogStyleChecker
@@ -14,8 +13,8 @@ def arg_parser():
     parser = argparse.ArgumentParser(
         description='Automate merging of feature branches.')
 
-    parser.add_argument('topic_branch', metavar='topic_branch', type=str,
-                        help='feature branch to merge')
+    parser.add_argument('topic_branch', nargs='?', metavar='topic_branch',
+                        type=str, help='feature branch to merge')
     parser.add_argument('--check', action='store_true', default=False)
     parser.add_argument('--skip-style-check', action='store_true')
     parser.add_argument('--skip-pr-check', action='store_true')
