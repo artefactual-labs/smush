@@ -29,7 +29,7 @@ class TopicMerge:
     def update_base_branch(self):
         """Update base branch and rebase topic branch."""
         # Make sure base branch is up to date
-        print('Checking out base branch...')
+        print("Checking out base branch '{}'...".format(self.base_branch))
         self.git.checkout(self.base_branch)
         print('Updating base branch...')
         self.git.pull('--rebase')
