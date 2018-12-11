@@ -3,14 +3,14 @@
 from __future__ import print_function
 import sys
 import app
-from topicmerge import TopicMerge
+import topicmerge
 
 
 def main(args, config):
     """Automates merging of topic branches.
 
-        usage: smush [-h] [--check] [--skip-style-check] [--skip-pr-check]
-                     [--delete-local] [--profile PROFILE]
+        usage: smush [-h] [--new] [--check] [--skip-style-check]
+                     [--skip-pr-check] [--delete-local] [--profile PROFILE]
                      [topic_branch]
 
     This script automates steps required to cleanly merge a topic branch into a
@@ -26,8 +26,22 @@ def main(args, config):
         args (argparse.Namespace): Command-line arguments and options.
         config (dict): Application configuration.
     """
+    # Create topic branch and exit, if in --new mode
+    if args.new:
+        if not args.topic_branch:
+            print("Please specify a branch name.")
+            sys.exit(1)
+
+        # Update base branch, creach topic branch, and push to base's origin
+        project_repo = topicmerge.CurrentRepo(config['base branch'])
+        starting_branch = project_repo.active_branch()
+        project_repo.update_base_branch()
+        project_repo.create_topic_branch(args.topic_branch)
+        project_repo.git.checkout(starting_branch)
+        sys.exit(0)
+
     # Initialize topic branch merge handler
-    merge = TopicMerge(config['base branch'], topic_branch=args.topic_branch, delete_local=args.delete_local)
+    merge = topicmerge.TopicMerge(config['base branch'], topic_branch=args.topic_branch, delete_local=args.delete_local)
 
     # Check branch and exit, if in --check mode
     if args.check:

@@ -97,3 +97,9 @@ https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 
 If you want to check the style of a branch without merging it, you can use the
 `--check` option.
+
+Branch creation
+---------------
+
+If you want to create a topic branch, locally and remotely, from the base
+branch, you can use the `--new` option.

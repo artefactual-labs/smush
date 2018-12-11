@@ -15,6 +15,7 @@ def arg_parser():
 
     parser.add_argument('topic_branch', nargs='?', metavar='topic_branch',
                         type=str, help='feature branch to merge')
+    parser.add_argument('--new', action='store_true', default=False)
     parser.add_argument('--check', action='store_true', default=False)
     parser.add_argument('--skip-style-check', action='store_true')
     parser.add_argument('--skip-pr-check', action='store_true')
