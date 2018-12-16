@@ -34,10 +34,9 @@ def main(args, config):
 
         # Update base branch, creach topic branch, and push to base's origin
         project_repo = topicmerge.CurrentRepo(config['base branch'])
-        starting_branch = project_repo.active_branch()
         project_repo.update_base_branch()
         project_repo.create_topic_branch(args.topic_branch)
-        project_repo.git.checkout(starting_branch)
+        print("Switched to new topic branch '{}'.".format(args.topic_branch))
         sys.exit(0)
 
     # Initialize topic branch merge handler
