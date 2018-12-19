@@ -75,7 +75,8 @@ class GitLogStyleChecker:
         line_number = 1
         for line in commit["body"]:
             if len(line) > 72:
-                errors.append("Body line {} exceeds 72 characters.".format(line_number))
+                line_description = 'starting with "{}"'.format(line[:15])
+                errors.append("Body line {} ({}) exceeds 72 characters.".format(line_number, line_description))
             line_number += 1
 
         # Add any errors to commit and append
