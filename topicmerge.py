@@ -1,5 +1,6 @@
 from __future__ import print_function
 from builtins import super
+import os
 import git
 
 
@@ -129,6 +130,9 @@ class TopicMerge(CurrentRepo):
         except git.exc.GitCommandError:
             return False
 
+    def unmerged_commits(self):
+        return self.repo.iter_commits('{}/{}..{}'.format(self.base_branch_remote(), self.base_branch, self.topic_branch))
+
     def unmerged_log(self):
         """Return Git log output for unmerged commits."""
         return self.git.log('{}..{}'.format(self.base_branch, self.topic_branch))
@@ -136,3 +140,16 @@ class TopicMerge(CurrentRepo):
     def unmerged_total(self):
         """Return number of unmerged commits."""
         return int(self.git.rev_list('--count', '{}..{}'.format(self.base_branch, self.topic_branch)))
+
+    def unmerged_files(self):
+        filepaths = []
+        file_root = self.repo.git.rev_parse('--show-toplevel')
+
+        for commit in self.unmerged_commits():
+            for filename in commit.stats.files:
+                filepath = os.path.join(file_root, filename)
+
+                if os.path.isfile(filepath) and not filepath in filepaths:
+                    filepaths.append(filepath)
+
+        return filepaths

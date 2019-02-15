@@ -60,7 +60,7 @@ def load_config(profile):
     return config
 
 
-def check_topic_branch_commits(merge, skip_style_check=False):
+def check_topic_branch_commits(merge, skip_style_check=False, syntax_check_scripts=None):
     """Check topic branch commit(s) for issues.
 
     Args:
@@ -93,6 +93,23 @@ def check_topic_branch_commits(merge, skip_style_check=False):
     if not skip_style_check:
         checker = GitLogStyleChecker(merge.unmerged_log())
         print(checker.summarize_style_errors())
+
+    # Show files with other errors
+    if syntax_check_scripts:
+        print('Checking unmerged files...')
+
+        for filepath in merge.unmerged_files():
+            filename, file_extension = os.path.splitext(filepath)
+            file_extension = file_extension[1:]
+            #print(str(type(syntax_check_scripts)))
+            if isinstance(syntax_check_scripts, dict) and file_extension in syntax_check_scripts:
+                check_command = syntax_check_scripts[file_extension].format(filepath)
+                process = subprocess.Popen(check_command, shell=True, stdout=subprocess.PIPE)
+                process.wait()
+                if process.returncode > 0:
+                    print('Error found in ' + filepath)
+
+        print('Check complete.')
 
 
 def check_for_pull_request(config, topic_branch):

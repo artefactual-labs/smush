@@ -71,7 +71,6 @@ Example:
 
    base branch: qa/2.5.x
 
-
 Setting ``github owner`` and ``github repo`` in your configuration file can,
 optionally, enable you to have smush check to make sure an open pull request
 exists for the topic branch.
@@ -79,6 +78,17 @@ exists for the topic branch.
 Setting ``before notes`` in your configuration file can, optionally, display
 notes/reminders before you merge. Likewise, setting ``after notes`` can display
 notes/reminders after you merge.
+
+Setting ``syntax check scripts`` in your configuration file can, optionally,
+check files changed by your topic branch using an external script. Different
+scripts can be specified for different file extensions.
+
+Example:
+
+.. code-block::
+
+    syntax check scripts:
+        php: "php -l {}"
 
 The ``--profile`` option can be used to load an alternative configuration. Using
 ``--profile=backport``\ , for example, would result in ``$HOME/.smush-backport.yml``
@@ -108,6 +118,13 @@ https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 
 If you want to check the style of a branch without merging it, you can use the
 ``--check`` option.
+
+Syntax checking
+---------------
+
+
+syntax check scripts:
+  php: "php -l {}"
 
 Branch creation
 ---------------

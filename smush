@@ -44,7 +44,10 @@ def main(args, config):
 
     # Check branch and exit, if in --check mode
     if args.check:
-        app.check_topic_branch_commits(merge, args.skip_style_check)
+        syntax_check_scripts = None
+        if 'syntax check scripts' in config:
+            syntax_check_scripts = config['syntax check scripts']
+        app.check_topic_branch_commits(merge, skip_style_check=args.skip_style_check, syntax_check_scripts=syntax_check_scripts)
         sys.exit(0)
 
     # Make sure an open pull request exists for the dev branch
