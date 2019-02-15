@@ -120,13 +120,6 @@ https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
 If you want to check the style of a branch without merging it, you can use the
 ``--check`` option.
 
-Syntax checking
----------------
-
-
-syntax check scripts:
-  php: "php -l {}"
-
 Branch creation
 ---------------
 
