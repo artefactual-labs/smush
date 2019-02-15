@@ -80,8 +80,9 @@ notes/reminders before you merge. Likewise, setting ``after notes`` can display
 notes/reminders after you merge.
 
 Setting ``syntax check scripts`` in your configuration file can, optionally,
-check files changed by your topic branch using an external script. Different
-scripts can be specified for different file extensions.
+check files, changed by commits in your topic branch, using an external script
+that you specify. Different scripts can be specified for different file
+extensions.
 
 Example:
 
