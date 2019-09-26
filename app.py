@@ -22,14 +22,20 @@ def arg_parser():
     parser.add_argument('--delete-local', action='store_true', default=False)
     parser.add_argument('--profile')
 
+    # Arguments that can be used instead of, or to override, configuration
+    parser.add_argument('--base-branch', nargs='?', metavar='base branch', type=str)
+    parser.add_argument('--github-owner', nargs='?', metavar='Github owner', type=str)
+    parser.add_argument('--github-repo', nargs='?', metavar='Github repo', type=str)
+
     return parser
 
 
-def load_config(profile):
+def load_config(profile=None, base_branch=None):
     """Return configuration, from YAML file, for this application.
 
     Args:
         profile (str, optional): name for profile (allows multiple configurations).
+        base_branch (str, optional): base branch (supplied outside of configuration).
 
     Raises:
         Exception: If not able to read or parse the configuration file for any
@@ -47,15 +53,17 @@ def load_config(profile):
 
     # Attempt to load configuration file from user's home directory
     config_path = os.path.join(os.path.expanduser('~'), config_filename)
+    config = {}
 
     try:
         config = yaml.safe_load(open(config_path))
     except:
-        raise Exception('Unable to load ~/{}: does it exist?'.format(config_filename))
+        if base_branch is None:
+            raise Exception('Unable to load ~/{}: does it exist?'.format(config_filename))
 
     # Verify base branch has been set in the config file
-    if 'base branch' not in config:
-        raise Exception('Please set "base branch" in {}.'.format(config_filename))
+    if 'base branch' not in config and base_branch is None:
+        raise Exception('Please set "base branch" in {} or specify via --base-branch.'.format(config_filename))
 
     return config
 
@@ -98,16 +106,25 @@ def check_topic_branch_commits(merge, skip_style_check=False, syntax_check_scrip
     if syntax_check_scripts:
         print('Checking unmerged files...')
 
+        error_messages = []
+
         for filepath in merge.unmerged_files():
             filename, file_extension = os.path.splitext(filepath)
             file_extension = file_extension[1:]
-            #print(str(type(syntax_check_scripts)))
+
             if isinstance(syntax_check_scripts, dict) and file_extension in syntax_check_scripts:
+                print('Checking ' + filepath + '...')
+
                 check_command = syntax_check_scripts[file_extension].format(filepath)
                 process = subprocess.Popen(check_command, shell=True, stdout=subprocess.PIPE)
                 process.wait()
+
                 if process.returncode > 0:
-                    print('Error found in ' + filepath)
+                    error_messages.append('Error found in ' + filepath)
+
+        if len(error_messages):
+            for error_message in error_messages:
+                print(error_message)
 
         print('Check complete.')
 

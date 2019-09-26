@@ -97,7 +97,17 @@ if __name__ == '__main__':
     try:
         # Parse CLI args and load configuration
         args = app.arg_parser().parse_args()
-        config = app.load_config(args.profile)
+        config = app.load_config(args.profile, args.base_branch)
+
+        # Allow config to be overridden via CLI options
+        if args.base_branch:
+            config['base branch'] = args.base_branch
+
+        if args.github_owner:
+            config['github owner'] = args.github_owner
+
+        if args.github_repo:
+            config['github repo'] = args.github_repo
 
         main(args, config)
     except Exception as e:
