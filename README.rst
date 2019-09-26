@@ -21,23 +21,23 @@ Usage: ``smush [topic branch]``
 Does the following:
 
 
-#. Optionally verify (depending on config file settings) if open pull request
-   exists for topic branch
-#. Optionally verify (depending on config file settings) if pull request base
-   branch matches configuration
-#. Optionally shows text reminders (from config file) before merge
+#. Optionally verify (depending on config file settings/CLI options) if open
+   pull request exists for topic branch
+#. Optionally verify (depending on config file settings/CLI options) if pull
+   request base branch matches configuration
+#. Optionally shows text reminders (if set in config file) before merge
 #. Updates base branch
 #. Rebases topic branch using base branch
 #. Force pushes topic branch
-#. Allows optional interactive rebasing if more than one commit is to be merged
 #. Displays unmerged commits
 #. Displays commit style issues (see **Style Checking**\ )
+#. Prompts to allow interactive rebasing if more than one commit is to be merged
 #. Asks confirmation to go ahead with merge
 #. Merges topic branch into base branch
 #. Pushes base branch
 #. Deletes topic branch
-#. Optionally delete local topic branch
-#. Optionally shows reminders (from config file) after merge
+#. Optionally (depending on CLI options) deletes local topic branch
+#. Optionally shows reminders (if set in config file) after merge
 
 If no topic branch is specified, the active branch will be used.
 
@@ -58,6 +58,7 @@ Installation
 
 #. 
    Stick the ``smush`` script somewhere you can run it from.
+
 
 Configuration
 -------------
@@ -94,6 +95,18 @@ Example:
 The ``--profile`` option can be used to load an alternative configuration. Using
 ``--profile=backport``\ , for example, would result in ``$HOME/.smush-backport.yml``
 being used as a configuration file.
+
+
+Use without configuration
+-------------------------
+
+Smush can also be run without configuration using command-line options.
+
+Example:
+
+    smush --base-branch="qa/2.6.x" --github-owner="artefactual" \
+        --github-repo="atom" dev/issue-13177-remove-js-file-reference
+
 
 Style checking
 --------------
