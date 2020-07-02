@@ -104,6 +104,8 @@ Smush can also be run without configuration using command-line options.
 
 Example:
 
+.. code-block::
+
     smush --base-branch="qa/2.6.x" --github-owner="artefactual" \
         --github-repo="atom" dev/issue-13177-remove-js-file-reference
 
