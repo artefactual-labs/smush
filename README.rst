@@ -60,6 +60,19 @@ Installation
    Stick the ``smush`` script somewhere you can run it from.
 
 
+Use without configuration
+-------------------------
+
+Smush can also be run without configuration using command-line options.
+
+Example:
+
+.. code-block::
+
+    smush --base-branch="qa/2.6.x" --github-owner="artefactual" \
+        --github-repo="atom" dev/issue-13177-remove-js-file-reference
+
+
 Configuration
 -------------
 
@@ -95,19 +108,6 @@ Example:
 The ``--profile`` option can be used to load an alternative configuration. Using
 ``--profile=backport``\ , for example, would result in ``$HOME/.smush-backport.yml``
 being used as a configuration file.
-
-
-Use without configuration
--------------------------
-
-Smush can also be run without configuration using command-line options.
-
-Example:
-
-.. code-block::
-
-    smush --base-branch="qa/2.6.x" --github-owner="artefactual" \
-        --github-repo="atom" dev/issue-13177-remove-js-file-reference
 
 
 Style checking
