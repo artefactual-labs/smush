@@ -57,13 +57,13 @@ Installation
     pip install -r requirements.txt
 
 #. 
-   Stick the ``smush`` script somewhere you can run it from.
+   Stick the ``bin/smush`` script somewhere you can run it from.
 
 
 Use without configuration
 -------------------------
 
-Smush can also be run without configuration using command-line options.
+Smush can be run without configuration using command-line options.
 
 Example:
 
