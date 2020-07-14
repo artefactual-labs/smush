@@ -55,11 +55,11 @@ def load_config(profile=None, base_branch=None):
     config_path = os.path.join(os.path.expanduser('~'), config_filename)
     config = {}
 
-    try:
+    # Make sure config file exists if needed
+    if not os.path.isfile(config_path) and base_branch is None:
+        raise Exception('Unable to open ~/{}: does it exist?'.format(config_filename))
+    else:
         config = yaml.safe_load(open(config_path))
-    except:
-        if base_branch is None:
-            raise Exception('Unable to load ~/{}: does it exist?'.format(config_filename))
 
     # Verify base branch has been set in the config file
     if 'base branch' not in config and base_branch is None:

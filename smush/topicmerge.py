@@ -149,7 +149,7 @@ class TopicMerge(CurrentRepo):
             for filename in commit.stats.files:
                 filepath = os.path.join(file_root, filename)
 
-                if os.path.isfile(filepath) and not filepath in filepaths:
+                if os.path.isfile(filepath) and filepath not in filepaths:
                     filepaths.append(filepath)
 
         return filepaths
