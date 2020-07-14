@@ -8,7 +8,7 @@ setup(
   author = 'Mike Cantelon',
   author_email = 'mcantelon@gmail.com',
   url = 'https://github.com/artefactual-labs/smush',
-  download_url = 'https://github.com/joelbarmettlerUZH/Scrapeasy/archive/pypi-0_1_3.tar.gz',
+  download_url = 'https://github.com/artefactual-labs/smush/archive/v0.0.1.zip',
   keywords = ['git'],
   install_requires=[
     "builtins; python_version >= '3.0'",
