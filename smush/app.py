@@ -5,7 +5,7 @@ import os
 import subprocess
 import github
 import yaml
-from smush.git_log_style_checker import GitLogStyleChecker
+from smush import GitLogStyleChecker
 
 
 def arg_parser():

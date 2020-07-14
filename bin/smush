@@ -6,8 +6,7 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 
-from smush import app
-from smush import topicmerge
+from smush import app, CurrentRepo, TopicMerge
 
 
 def main(args, config):
@@ -37,14 +36,14 @@ def main(args, config):
             sys.exit(1)
 
         # Update base branch, creach topic branch, and push to base's origin
-        project_repo = topicmerge.CurrentRepo(config['base branch'])
+        project_repo = CurrentRepo(config['base branch'])
         project_repo.update_base_branch()
         project_repo.create_topic_branch(args.topic_branch)
         print("Switched to new topic branch '{}'.".format(args.topic_branch))
         sys.exit(0)
 
     # Initialize topic branch merge handler
-    merge = topicmerge.TopicMerge(config['base branch'], topic_branch=args.topic_branch, delete_local=args.delete_local)
+    merge = TopicMerge(config['base branch'], topic_branch=args.topic_branch, delete_local=args.delete_local)
 
     # Check branch and exit, if in --check mode
     if args.check:
