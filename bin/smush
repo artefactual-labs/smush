@@ -6,7 +6,7 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 
-from smush import app, CurrentRepo, TopicMerge
+from smush import app, CurrentRepo, TopicMerge, __version__ as VERSION
 
 
 def main(args, config):
@@ -29,6 +29,11 @@ def main(args, config):
         args (argparse.Namespace): Command-line arguments and options.
         config (dict): Application configuration.
     """
+    # Show version and exit, if in --version mode
+    if args.version:
+        print('smush version {}'.format(VERSION))
+        sys.exit(0)
+
     # Create topic branch and exit, if in --new mode
     if args.new:
         if not args.topic_branch:

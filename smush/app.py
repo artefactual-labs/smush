@@ -27,6 +27,8 @@ def arg_parser():
     parser.add_argument('--github-owner', nargs='?', metavar='Github owner', type=str)
     parser.add_argument('--github-repo', nargs='?', metavar='Github repo', type=str)
 
+    parser.add_argument('--version', action='store_true', help='display version and exit')
+
     return parser
 
 
