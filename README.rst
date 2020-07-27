@@ -50,6 +50,13 @@ The ``--delete-local`` option deletes the local topic branch.
 Installation
 ------------
 
+Install from Python Package Index:
+
+.. code-block::
+
+    pip install smush
+
+Or...
 
 #. 
    Install the required Python modules:
