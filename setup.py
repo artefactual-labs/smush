@@ -10,7 +10,7 @@ README = (HERE / "README.rst").read_text()
 setup(
   name = 'smush',
   packages = ['smush'],
-  version = '0.0.1',
+  version = '0.0.2',
   license='MIT',
   description = 'Tool to automate merging of topic branches',
   author = 'Mike Cantelon',
