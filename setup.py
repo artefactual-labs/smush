@@ -11,7 +11,7 @@ README = open(readmeFile, "r").read()
 setup(
   name = 'smush',
   packages = ['smush'],
-  version = '0.0.2',
+  version = '0.0.3',
   license='MIT',
   description = 'Tool to automate merging of topic branches',
   author = 'Mike Cantelon',
