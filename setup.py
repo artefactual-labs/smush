@@ -25,7 +25,6 @@ setup(
   keywords = ['git'],
 
   install_requires = [
-    "builtins; python_version >= '3.0'",
     "future",
     "gitpython",
     "pygithub",
