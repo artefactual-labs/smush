@@ -1,11 +1,12 @@
-import pathlib
+import os
 from setuptools import setup
 
 # The directory containing this file
-HERE = pathlib.Path(__file__).parent
+HERE = os.path.dirname(os.path.realpath(__file__))
 
 # The text of the README file
-README = (HERE / "README.rst").read_text()
+readmeFile = os.path.join(HERE, "README.rst")
+README = open(readmeFile, "r").read()
 
 setup(
   name = 'smush',
