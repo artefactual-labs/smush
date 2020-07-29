@@ -15,19 +15,20 @@ def arg_parser():
 
     parser.add_argument('topic_branch', nargs='?', metavar='topic_branch',
                         type=str, help='feature branch to merge')
-    parser.add_argument('--new', action='store_true', default=False)
-    parser.add_argument('--check', action='store_true', default=False)
-    parser.add_argument('--skip-style-check', action='store_true')
-    parser.add_argument('--skip-pr-check', action='store_true')
-    parser.add_argument('--delete-local', action='store_true', default=False)
-    parser.add_argument('--profile')
+    parser.add_argument('-n', '--new', action='store_true', default=False)
+    parser.add_argument('-c', '--check', action='store_true', default=False)
+    parser.add_argument('-d', '--delete-local', action='store_true', default=False)
+    parser.add_argument('-p', '--profile')
 
     # Arguments that can be used instead of, or to override, configuration
-    parser.add_argument('--base-branch', nargs='?', metavar='base branch', type=str)
-    parser.add_argument('--github-owner', nargs='?', metavar='Github owner', type=str)
-    parser.add_argument('--github-repo', nargs='?', metavar='Github repo', type=str)
+    parser.add_argument('-b', '--base-branch', nargs='?', metavar='base branch', type=str)
+    parser.add_argument('-o', '--github-owner', nargs='?', metavar='Github owner', type=str)
+    parser.add_argument('-r', '--github-repo', nargs='?', metavar='Github repo', type=str)
 
-    parser.add_argument('--version', action='store_true', help='display version and exit')
+    parser.add_argument('-v', '--version', action='store_true', help='display version and exit')
+
+    parser.add_argument('--skip-style-check', action='store_true')
+    parser.add_argument('--skip-pr-check', action='store_true')
 
     return parser
 
