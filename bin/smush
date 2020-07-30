@@ -29,11 +29,6 @@ def main(args, config):
         args (argparse.Namespace): Command-line arguments and options.
         config (dict): Application configuration.
     """
-    # Show version and exit, if in --version mode
-    if args.version:
-        print('smush version {}'.format(VERSION))
-        sys.exit(0)
-
     # Create topic branch and exit, if in --new mode
     if args.new:
         if not args.topic_branch:
@@ -105,6 +100,12 @@ if __name__ == '__main__':
     try:
         # Parse CLI args and load configuration
         args = app.arg_parser().parse_args()
+
+        # Show version and exit, if in --version mode
+        if args.version:
+            print('smush version {}'.format(VERSION))
+            sys.exit(0)
+
         config = app.load_config(args.profile, args.base_branch)
 
         # Allow config to be overridden via CLI options
