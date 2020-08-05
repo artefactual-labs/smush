@@ -23,7 +23,6 @@ setup(
   long_description_content_type='text/x-rst',
 
   url='https://github.com/artefactual-labs/smush',
-  download_url='https://github.com/artefactual-labs/smush/archive/v0.0.1.zip',
 
   keywords=['git'],
 
