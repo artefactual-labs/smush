@@ -13,7 +13,7 @@ with open('README.rst') as f:
 setup(
   name='smush',
   packages=['smush'],
-  version='0.0.6',
+  version='0.0.7',
   license='MIT',
   description='Tool to automate merging of topic branches',
   author='Mike Cantelon',
