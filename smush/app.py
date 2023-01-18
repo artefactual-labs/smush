@@ -1,6 +1,7 @@
 from __future__ import print_function
 from builtins import input
 import argparse
+import git
 import os
 import subprocess
 import github
@@ -63,6 +64,14 @@ def load_config(profile=None, base_branch=None):
         raise Exception('Unable to open ~/{}: does it exist?'.format(config_filename))
     else:
         config = yaml.safe_load(open(config_path))
+
+    # Allow pre-repo base branch setting
+    if 'base branch' not in config and base_branch is None:
+        g = git.cmd.Git(".")
+        origin_url = g.execute(["git", "config", "--get", "remote.origin.url"])
+
+        if origin_url in config:
+            config["base branch"] = config[origin_url]["base branch"]
 
     # Verify base branch has been set in the config file
     if 'base branch' not in config and base_branch is None:
